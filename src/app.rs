@@ -24,6 +24,7 @@ use gtk::prelude::{ApplicationExt, GtkWindowExt, OrientableExt, SettingsExt, Wid
 use gtk::{gio, glib};
 
 pub struct App {
+    is_loading: bool,
     hourly_entries: FactoryVecDeque<HourEntryWidget>,
     daily_entries: FactoryVecDeque<DayEntryWidget>,
 }
@@ -74,59 +75,72 @@ impl Component for App {
                     None
                 },
 
-            gtk::Box {
-                set_orientation: gtk::Orientation::Vertical,
+            if model.is_loading {
 
-                adw::HeaderBar {
-                    pack_start = &gtk::Button {
-                        set_icon_name: "view-refresh-symbolic",
-                        connect_clicked => AppMsg::RefreshWeatherData
+                adw::Spinner {
+                    set_halign: gtk::Align::Center,
+                    set_valign: gtk::Align::Center,
+                    set_width_request: 64,
+                    set_height_request: 64,
+                }
+
+            } else {
+
+                gtk::Box {
+                    set_orientation: gtk::Orientation::Vertical,
+
+                    adw::HeaderBar {
+                        pack_start = &gtk::Button {
+                            set_icon_name: "view-refresh-symbolic",
+                            connect_clicked => AppMsg::RefreshWeatherData
+                        },
+                        pack_end = &gtk::MenuButton {
+                            set_icon_name: "open-menu-symbolic",
+                            set_menu_model: Some(&primary_menu),
+                        }
                     },
-                    pack_end = &gtk::MenuButton {
-                        set_icon_name: "open-menu-symbolic",
-                        set_menu_model: Some(&primary_menu),
-                    }
-                },
 
-                gtk::Label {
-                    set_label: "Hourly",
-                    add_css_class: "title-1",
-                },
+                    gtk::Label {
+                        set_label: "Hourly",
+                        add_css_class: "title-1",
+                    },
 
-                gtk::ScrolledWindow {
-                    set_hexpand: true,
-                    set_height_request: 250,
-                    set_propagate_natural_width: false,
-                    set_policy: (gtk::PolicyType::Automatic, gtk::PolicyType::Never),
+                    gtk::ScrolledWindow {
+                        set_hexpand: true,
+                        set_height_request: 250,
+                        set_propagate_natural_width: false,
+                        set_policy: (gtk::PolicyType::Automatic, gtk::PolicyType::Never),
 
-                    #[local_ref]
-                    hourly_box -> gtk::Box {
-                        set_orientation: gtk::Orientation::Horizontal,
-                        set_spacing: 5,
-                        set_margin_all: 5,
-                    }
-                },
+                        #[local_ref]
+                        hourly_box -> gtk::Box {
+                            set_orientation: gtk::Orientation::Horizontal,
+                            set_spacing: 5,
+                            set_margin_all: 5,
+                        }
+                    },
 
-                gtk::Label {
-                    set_label: "Daily",
-                    add_css_class: "title-1",
-                },
+                    gtk::Label {
+                        set_label: "Daily",
+                        add_css_class: "title-1",
+                    },
 
-                gtk::ScrolledWindow {
-                    set_hexpand: true,
-                    set_height_request: 250,
-                    set_propagate_natural_width: false,
-                    set_policy: (gtk::PolicyType::Automatic, gtk::PolicyType::Never),
+                    gtk::ScrolledWindow {
+                        set_hexpand: true,
+                        set_height_request: 250,
+                        set_propagate_natural_width: false,
+                        set_policy: (gtk::PolicyType::Automatic, gtk::PolicyType::Never),
 
-                    #[local_ref]
-                    daily_box -> gtk::Box {
-                        set_orientation: gtk::Orientation::Horizontal,
-                        set_spacing: 5,
-                        set_margin_all: 5,
-                    }
-                },
+                        #[local_ref]
+                        daily_box -> gtk::Box {
+                            set_orientation: gtk::Orientation::Horizontal,
+                            set_spacing: 5,
+                            set_margin_all: 5,
+                        }
+                    },
+                }
 
             }
+
 
         }
     }
@@ -143,6 +157,7 @@ impl Component for App {
             .launch(gtk::Box::default())
             .forward(sender.input_sender(), |output| output);
         let model = Self {
+            is_loading: false,
             hourly_entries,
             daily_entries,
         };
@@ -185,35 +200,40 @@ impl Component for App {
 
         widgets.load_window_size();
 
+        sender.input(AppMsg::RefreshWeatherData);
+
         ComponentParts { model, widgets }
     }
 
     fn update(&mut self, message: Self::Input, sender: ComponentSender<Self>, _root: &Self::Root) {
         match message {
-            AppMsg::RefreshWeatherData => sender.oneshot_command(async move {
-                let weather_api = WeatherApi::init(true);
-                let weather_results = weather_api
-                    .get_weather(
-                        weather_api::weather::CityCoordinates {
-                            latitude: 51.908481,
-                            longitude: -8.475720,
-                        },
-                        weather_api::weather::ForecastTimeframe::Daily,
-                    )
-                    .await;
-                let daily_entries = weather_results.unwrap().daily.unwrap().to_entries();
-                let weather_results = weather_api
-                    .get_weather(
-                        weather_api::weather::CityCoordinates {
-                            latitude: 51.908481,
-                            longitude: -8.475720,
-                        },
-                        weather_api::weather::ForecastTimeframe::Hourly,
-                    )
-                    .await;
-                let hourly_entries = weather_results.unwrap().hourly.unwrap().to_entries();
-                AppMsg::SetWeatherData(hourly_entries, daily_entries)
-            }),
+            AppMsg::RefreshWeatherData => {
+                self.is_loading = true;
+                sender.oneshot_command(async move {
+                    let weather_api = WeatherApi::init(true);
+                    let weather_results = weather_api
+                        .get_weather(
+                            weather_api::weather::CityCoordinates {
+                                latitude: 51.908481,
+                                longitude: -8.475720,
+                            },
+                            weather_api::weather::ForecastTimeframe::Daily,
+                        )
+                        .await;
+                    let daily_entries = weather_results.unwrap().daily.unwrap().to_entries();
+                    let weather_results = weather_api
+                        .get_weather(
+                            weather_api::weather::CityCoordinates {
+                                latitude: 51.908481,
+                                longitude: -8.475720,
+                            },
+                            weather_api::weather::ForecastTimeframe::Hourly,
+                        )
+                        .await;
+                    let hourly_entries = weather_results.unwrap().hourly.unwrap().to_entries();
+                    AppMsg::SetWeatherData(hourly_entries, daily_entries)
+                });
+            }
             AppMsg::Quit => main_application().quit(),
             AppMsg::SetWeatherData(hour_entries, day_entries) => {
                 for entry in hour_entries {
@@ -222,6 +242,7 @@ impl Component for App {
                 for entry in day_entries {
                     self.daily_entries.guard().push_back(entry);
                 }
+                self.is_loading = false;
             }
         }
     }
