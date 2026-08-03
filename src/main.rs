@@ -35,7 +35,7 @@ fn main() {
     gettextrs::textdomain(GETTEXT_PACKAGE).expect("Unable to switch to the text domain");
     relm4_icons::initialize_icons(icon_names::GRESOURCE_BYTES, icon_names::RESOURCE_PREFIX);
 
-    glib::set_application_name(&gettext("Aimsir"));
+    glib::set_application_name(&gettext("Drizzle"));
 
     let res = gio::Resource::load(RESOURCES_FILE).expect("Could not load gresource file");
     gio::resources_register(&res);
@@ -43,13 +43,13 @@ fn main() {
     gtk::Window::set_default_icon_name(APP_ID);
 
     let app = main_application();
-    app.set_resource_base_path(Some("/com/github/leo030303/aimsir/"));
+    app.set_resource_base_path(Some("/com/github/leo030303/drizzle/"));
 
     let app = RelmApp::from_app(app);
 
     let data = res
         .lookup_data(
-            "/com/github/leo030303/aimsir/style.css",
+            "/com/github/leo030303/drizzle/style.css",
             gio::ResourceLookupFlags::NONE,
         )
         .unwrap();

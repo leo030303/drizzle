@@ -1,5 +1,5 @@
 project(
-  'aimsir',
+  'drizzle',
   'rust',
   version: '0.1.0',
   meson_version: '>= 1.9.2',
@@ -9,7 +9,7 @@ project(
 i18n = import('i18n')
 gnome = import('gnome')
 
-base_id = 'com.github.leo030303.aimsir'
+base_id = 'com.github.leo030303.drizzle'
 
 dependency('glib-2.0', version: '>= 2.86.3')
 dependency('gio-2.0', version: '>= 2.86.3')

@@ -5,23 +5,23 @@
   <metadata_license>CC0</metadata_license>
   <!-- Insert your license of choice here -->
   <!-- <project_license>MIT</project_license> -->
-  <name>Aimsir</name>
+  <name>Drizzle</name>
   <summary>Write a GTK + Rust application</summary>
   <description>
     <p>A boilerplate template for GTK + Rust. It uses Meson as a build system and has flatpak support by default.</p>
   </description>
   <screenshots>
     <screenshot type="default">
-      <image>https://gitlab.gnome.org/bilelmoussaoui/aimsir/raw/master/data/resources/screenshots/screenshot1.png</image>
+      <image>https://gitlab.gnome.org/bilelmoussaoui/drizzle/raw/master/data/resources/screenshots/screenshot1.png</image>
       <caption>Main window</caption>
     </screenshot>
   </screenshots>
-  <url type="homepage">https://gitlab.gnome.org/bilelmoussaoui/aimsir</url>
-  <url type="bugtracker">https://gitlab.gnome.org/bilelmoussaoui/aimsir/issues</url>
+  <url type="homepage">https://gitlab.gnome.org/bilelmoussaoui/drizzle</url>
+  <url type="bugtracker">https://gitlab.gnome.org/bilelmoussaoui/drizzle/issues</url>
   <!-- Source code repository -->
-  <url type="vcs-browser">https://gitlab.gnome.org/bilelmoussaoui/aimsir</url>
+  <url type="vcs-browser">https://gitlab.gnome.org/bilelmoussaoui/drizzle</url>
   <!-- Translation repository -->
-  <url type="translate">https://gitlab.gnome.org/bilelmoussaoui/aimsir/-/tree/master/po</url>
+  <url type="translate">https://gitlab.gnome.org/bilelmoussaoui/drizzle/-/tree/master/po</url>
   <!-- Open Age Ratings Service:
        https://hughsie.github.io/oars/generate.html
   -->
@@ -43,14 +43,14 @@
   <developer id="gnome.org">
     <name translate="no">Leo Ring</name>
   </developer>
-  <!-- 
+  <!--
     Branding colors:
     https://docs.flathub.org/docs/for-app-authors/metainfo-guidelines/#brand-color
   -->
   <branding>
     <color type="primary" scheme_preference="light">#ff00ff</color>
     <color type="primary" scheme_preference="dark">#993d3d</color>
-  </branding>  
+  </branding>
   <update_contact>leoring03@gmail.com</update_contact>
   <translation type="gettext">@gettext-package@</translation>
   <launchable type="desktop-id">@app-id@.desktop</launchable>

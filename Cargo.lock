@@ -18,21 +18,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "aimsir"
-version = "0.1.0"
-dependencies = [
- "chrono",
- "gettext-rs",
- "relm4",
- "relm4-icons",
- "relm4-icons-build",
- "reqwest",
- "serde",
- "tracing",
- "tracing-subscriber",
-]
-
-[[package]]
 name = "android_system_properties"
 version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -259,6 +244,21 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 3.0.3",
+]
+
+[[package]]
+name = "drizzle"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "gettext-rs",
+ "relm4",
+ "relm4-icons",
+ "relm4-icons-build",
+ "reqwest",
+ "serde",
+ "tracing",
+ "tracing-subscriber",
 ]
 
 [[package]]

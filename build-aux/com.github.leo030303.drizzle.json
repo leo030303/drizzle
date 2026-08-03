@@ -1,5 +1,5 @@
 {
-    "id": "com.github.leo030303.aimsir.Devel",
+    "id": "com.github.leo030303.drizzle",
     "runtime": "org.gnome.Platform",
     "runtime-version": "50",
     "sdk": "org.gnome.Sdk",
@@ -7,16 +7,13 @@
         "org.freedesktop.Sdk.Extension.rust-stable",
         "org.freedesktop.Sdk.Extension.llvm22"
     ],
-    "command": "aimsir",
+    "command": "drizzle",
     "finish-args": [
         "--share=ipc",
         "--share=network",
         "--socket=fallback-x11",
         "--socket=wayland",
-        "--device=dri",
-        "--env=RUST_LOG=aimsir=debug",
-        "--env=G_MESSAGES_DEBUG=none",
-        "--env=RUST_BACKTRACE=1"
+        "--device=dri"
     ],
     "build-options": {
         "append-path": "/usr/lib/sdk/rust-stable/bin:/usr/lib/sdk/llvm22/bin",
@@ -37,12 +34,9 @@
     },
     "modules": [
         {
-            "name": "aimsir",
+            "name": "drizzle",
             "buildsystem": "meson",
             "run-tests": true,
-            "config-opts": [
-                "-Dprofile=development"
-            ],
             "sources": [
                 {
                     "type": "dir",

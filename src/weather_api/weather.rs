@@ -1,5 +1,4 @@
 use serde::Deserialize;
-use std::collections::HashMap;
 
 pub struct WeatherApi {
     is_metric: bool,
@@ -9,28 +8,44 @@ const OPEN_METEO_BASE_URL: &str = "https://api.open-meteo.com/v1/forecast";
 
 #[derive(Debug, Deserialize)]
 pub struct WeatherResponse {
-    pub latitude: f64,
-    pub longitude: f64,
-    pub elevation: f64,
-    pub generationtime_ms: f64,
     pub utc_offset_seconds: i64,
-    pub timezone: String,
-    pub timezone_abbreviation: String,
 
     #[serde(default)]
     pub current: Option<CurrentWeather>,
-    #[serde(default)]
-    pub current_units: Option<HashMap<String, String>>,
 
     #[serde(default)]
     pub hourly: Option<HourlyWeather>,
-    #[serde(default)]
-    pub hourly_units: Option<HashMap<String, String>>,
 
     #[serde(default)]
     pub daily: Option<DailyWeather>,
-    #[serde(default)]
-    pub daily_units: Option<HashMap<String, String>>,
+}
+
+impl WeatherResponse {
+    /// Applies the UTC offset directly to all timestamp fields in current, hourly, and daily forecasts.
+    pub fn apply_utc_offset(&mut self) {
+        let offset = self.utc_offset_seconds;
+
+        if let Some(current) = self.current.as_mut() {
+            current.time += offset;
+        }
+        if let Some(hourly) = self.hourly.as_mut() {
+            for time in hourly.time.iter_mut() {
+                *time += offset;
+            }
+        }
+
+        if let Some(daily) = self.daily.as_mut() {
+            for time in daily.time.iter_mut() {
+                *time += offset;
+            }
+            for time in daily.sunrise.iter_mut() {
+                *time += offset;
+            }
+            for time in daily.sunset.iter_mut() {
+                *time += offset;
+            }
+        }
+    }
 }
 
 /// WMO Weather interpretation codes (WW)
@@ -114,6 +129,36 @@ impl WeatherCode {
             | WeatherCode::ThunderstormHeavyHail => "thunderstorm",
         }
     }
+    pub fn get_background_css_class(&self) -> &'static str {
+        match self {
+            WeatherCode::ClearSky | WeatherCode::MainlyClear => "bg-weather-clear-sky",
+            WeatherCode::PartlyCloudy => "bg-weather-few-clouds",
+            WeatherCode::Overcast => "bg-weather-overcast",
+            WeatherCode::Fog | WeatherCode::DepositingRimeFog => "bg-weather-fog",
+            WeatherCode::LightRainShowers
+            | WeatherCode::LightDrizzle
+            | WeatherCode::ModerateDrizzle
+            | WeatherCode::LightFreezingDrizzle
+            | WeatherCode::LightRain
+            | WeatherCode::LightFreezingRain => "bg-weather-showers-scattered",
+            WeatherCode::ModerateRain
+            | WeatherCode::HeavyRain
+            | WeatherCode::DenseFreezingDrizzle
+            | WeatherCode::DenseDrizzle
+            | WeatherCode::ModerateRainShowers
+            | WeatherCode::ViolentRainShowers
+            | WeatherCode::HeavyFreezingRain => "bg-weather-showers-large",
+            WeatherCode::LightSnowShowers
+            | WeatherCode::HeavySnowShowers
+            | WeatherCode::LightSnowFall
+            | WeatherCode::ModerateSnowFall
+            | WeatherCode::HeavySnowFall
+            | WeatherCode::SnowGrains => "bg-weather-snow",
+            WeatherCode::Thunderstorm
+            | WeatherCode::ThunderstormLightHail
+            | WeatherCode::ThunderstormHeavyHail => "bg-weather-storm",
+        }
+    }
 }
 
 impl TryFrom<i64> for WeatherCode {
@@ -178,6 +223,7 @@ pub struct DailyWeather {
     pub sunset: Vec<i64>,
     pub uv_index_max: Vec<f64>,
     pub precipitation_sum: Vec<f64>,
+    pub precipitation_probability_max: Vec<f64>,
     pub windspeed_10m_max: Vec<f64>,
 }
 
@@ -217,6 +263,7 @@ pub struct DayEntry {
     pub sunset: i64,
     pub uv_index_max: f64,
     pub precipitation_sum: f64,
+    pub precipitation_probability_max: f64,
     pub windspeed_10m_max: f64,
 }
 
@@ -254,6 +301,7 @@ impl DailyWeather {
                 sunset: self.sunset[i],
                 uv_index_max: self.uv_index_max[i],
                 precipitation_sum: self.precipitation_sum[i],
+                precipitation_probability_max: self.precipitation_probability_max[i],
                 windspeed_10m_max: self.windspeed_10m_max[i],
             })
             .collect()
@@ -282,7 +330,7 @@ const CURRENT_METRICS_LIST: [&str; 8] = [
     "winddirection_10m",
 ];
 
-const DAILY_METRICS_LIST: [&str; 8] = [
+const DAILY_METRICS_LIST: [&str; 9] = [
     "weathercode",
     "temperature_2m_max",
     "temperature_2m_min",
@@ -290,6 +338,7 @@ const DAILY_METRICS_LIST: [&str; 8] = [
     "sunset",
     "uv_index_max",
     "precipitation_sum",
+    "precipitation_probability_max",
     "windspeed_10m_max",
 ];
 
@@ -323,7 +372,7 @@ impl WeatherApi {
                 weather_url.push_str(&format!("&current={}", CURRENT_METRICS_LIST.join(",")))
             }
             ForecastTimeframe::Hourly => weather_url.push_str(&format!(
-                "&hourly={}&forecast_days=2",
+                "&hourly={}&forecast_hours=48",
                 HOURLY_METRICS_LIST.join(",")
             )),
             ForecastTimeframe::Daily => weather_url.push_str(&format!(
@@ -334,11 +383,12 @@ impl WeatherApi {
         if !self.is_metric {
             weather_url.push_str("&temperature_unit=fahrenheit&wind_speed_unit=mph");
         }
-        let weather_data = reqwest::get(weather_url)
+        let mut weather_data = reqwest::get(weather_url)
             .await?
             .json::<WeatherResponse>()
             .await?;
 
+        weather_data.apply_utc_offset();
         Ok(weather_data)
     }
 }

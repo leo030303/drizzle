@@ -19,9 +19,9 @@ impl SimpleComponent for AboutDialog {
             // Insert your license of choice here
             // .license_type(gtk::License::MitX11)
             // Insert your website here
-            // .website("https://gitlab.gnome.org/bilelmoussaoui/aimsir/")
+            // .website("https://gitlab.gnome.org/bilelmoussaoui/drizzle/")
             // Insert your Issues page
-            // .issue_url("https://gitlab.gnome.org/World/Rust/aimsir/-/issues")
+            // .issue_url("https://gitlab.gnome.org/World/Rust/drizzle/-/issues")
             // Insert your application name here
             .application_name("Relm4-template")
             .version(VERSION)

@@ -1,5 +1,5 @@
 [package]
-name = "aimsir"
+name = "drizzle"
 version = "0.1.0"
 authors = ["Leo Ring <leoring03@gmail.com>"]
 edition = "2024"

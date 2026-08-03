@@ -1,10 +1,12 @@
-use chrono::{Datelike, Timelike};
 use relm4::{
     gtk::prelude::{BoxExt, OrientableExt, WidgetExt},
     prelude::*,
 };
 
-use crate::{app::AppMsg, weather_api::weather::DayEntry};
+use crate::{
+    app::AppMsg,
+    weather_api::weather::{DayEntry, WeatherCode},
+};
 
 pub struct DayEntryWidget {
     pub forecast_data: DayEntry,
@@ -22,6 +24,7 @@ impl FactoryComponent for DayEntryWidget {
         gtk::Box{
             set_orientation: gtk::Orientation::Vertical,
             add_css_class: "card",
+            add_css_class: "bg-transparency",
             set_spacing: 5,
             gtk::Label {
                 add_css_class: "title-4",
@@ -29,34 +32,35 @@ impl FactoryComponent for DayEntryWidget {
                 set_margin_horizontal: 5,
                 set_margin_top: 5,
             },
-            gtk::Label {
-                set_label: &format!("{} / {}", self.forecast_data.temperature_2m_max, self.forecast_data.temperature_2m_min),
+            gtk::Image {
+                set_icon_name: Some(WeatherCode::try_from(self.forecast_data.weathercode).unwrap().get_icon_name(true)),
+                set_icon_size: gtk::IconSize::Large,
                 set_margin_horizontal: 5,
             },
             gtk::Label {
-                set_label: &self.forecast_data.weathercode.to_string(),
+                set_label: &format!("{}℃ / {}℃", self.forecast_data.temperature_2m_max, self.forecast_data.temperature_2m_min),
                 set_margin_horizontal: 5,
             },
             gtk::Label {
-                set_label: &self.forecast_data.sunrise.to_string(),
+                set_label: &format!("Sunrise: {}", chrono::DateTime::from_timestamp_secs(self.forecast_data.sunrise).unwrap().format("%H:%M")),
                 set_margin_horizontal: 5,
             },
             gtk::Label {
-                set_label: &self.forecast_data.sunset.to_string(),
+                set_label: &format!("Sunset: {}", chrono::DateTime::from_timestamp_secs(self.forecast_data.sunset).unwrap().format("%H:%M")),
                 set_margin_horizontal: 5,
             },
             gtk::Label {
-                set_label: &self.forecast_data.precipitation_sum.to_string(),
+                set_label: &format!("Rain: {}mm / {}%", self.forecast_data.precipitation_sum, self.forecast_data.precipitation_probability_max),
                 set_margin_horizontal: 5,
             },
             gtk::Label {
-                set_label: &self.forecast_data.windspeed_10m_max.to_string(),
+                set_label: &format!("Wind: {}km/h", self.forecast_data.windspeed_10m_max),
                 set_margin_horizontal: 5,
             },
             gtk::Label {
-                set_label: &self.forecast_data.uv_index_max.to_string(),
-                set_margin_bottom: 5,
-            }
+                set_label: &format!("UV Index: {}", self.forecast_data.uv_index_max),
+                set_margin_horizontal: 5,
+            },
         }
     }
 

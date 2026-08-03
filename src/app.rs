@@ -1,11 +1,12 @@
 use crate::config::APP_ID;
-use crate::config::PROFILE;
 use crate::modals::about::AboutDialog;
 use crate::modals::shortcuts::ShortcutsDialog;
 use crate::ui::daily_entry_widget::DayEntryWidget;
 use crate::ui::hour_entry_widget::HourEntryWidget;
+use crate::weather_api::weather::CurrentWeather;
 use crate::weather_api::weather::DayEntry;
 use crate::weather_api::weather::HourlyEntry;
+use crate::weather_api::weather::WeatherCode;
 use crate::weather_api::{self, weather::WeatherApi};
 use relm4::{
     Component, ComponentParts, ComponentSender, RelmWidgetExt,
@@ -27,12 +28,13 @@ pub struct App {
     is_loading: bool,
     hourly_entries: FactoryVecDeque<HourEntryWidget>,
     daily_entries: FactoryVecDeque<DayEntryWidget>,
+    current_weather: Option<CurrentWeather>,
 }
 
 #[derive(Debug)]
 pub enum AppMsg {
     RefreshWeatherData,
-    SetWeatherData(Vec<HourlyEntry>, Vec<DayEntry>),
+    SetWeatherData(Vec<HourlyEntry>, Vec<DayEntry>, CurrentWeather),
     Quit,
 }
 
@@ -55,7 +57,7 @@ impl Component for App {
             section! {
                 "_Preferences" => PreferencesAction,
                 "_Keyboard" => ShortcutsAction,
-                "_About Aimsir" => AboutAction,
+                "_About Drizzle" => AboutAction,
             }
         }
     }
@@ -68,12 +70,6 @@ impl Component for App {
                 sender.input(AppMsg::Quit);
                 glib::Propagation::Stop
             },
-
-            add_css_class?: if PROFILE == "Devel" {
-                    Some("devel")
-                } else {
-                    None
-                },
 
             if model.is_loading {
 
@@ -88,8 +84,12 @@ impl Component for App {
 
                 gtk::Box {
                     set_orientation: gtk::Orientation::Vertical,
+                    #[watch]
+                    add_css_class?: model.current_weather.as_ref().map(|current_weather| WeatherCode::try_from(current_weather.weathercode).unwrap().get_background_css_class()),
+
 
                     adw::HeaderBar {
+                        add_css_class: "bg-transparency",
                         pack_start = &gtk::Button {
                             set_icon_name: "view-refresh-symbolic",
                             connect_clicked => AppMsg::RefreshWeatherData
@@ -107,7 +107,7 @@ impl Component for App {
 
                     gtk::ScrolledWindow {
                         set_hexpand: true,
-                        set_height_request: 250,
+                        set_height_request: 170,
                         set_propagate_natural_width: false,
                         set_policy: (gtk::PolicyType::Automatic, gtk::PolicyType::Never),
 
@@ -160,6 +160,7 @@ impl Component for App {
             is_loading: false,
             hourly_entries,
             daily_entries,
+            current_weather: None,
         };
         let hourly_box = model.hourly_entries.widget();
         let daily_box = model.daily_entries.widget();
@@ -231,17 +232,28 @@ impl Component for App {
                         )
                         .await;
                     let hourly_entries = weather_results.unwrap().hourly.unwrap().to_entries();
-                    AppMsg::SetWeatherData(hourly_entries, daily_entries)
+                    let weather_results = weather_api
+                        .get_weather(
+                            weather_api::weather::CityCoordinates {
+                                latitude: 51.908481,
+                                longitude: -8.475720,
+                            },
+                            weather_api::weather::ForecastTimeframe::Current,
+                        )
+                        .await;
+                    let current_weather = weather_results.unwrap().current.unwrap();
+                    AppMsg::SetWeatherData(hourly_entries, daily_entries, current_weather)
                 });
             }
             AppMsg::Quit => main_application().quit(),
-            AppMsg::SetWeatherData(hour_entries, day_entries) => {
+            AppMsg::SetWeatherData(hour_entries, day_entries, current_weather) => {
                 for entry in hour_entries {
                     self.hourly_entries.guard().push_back(entry);
                 }
                 for entry in day_entries {
                     self.daily_entries.guard().push_back(entry);
                 }
+                self.current_weather = Some(current_weather);
                 self.is_loading = false;
             }
         }
