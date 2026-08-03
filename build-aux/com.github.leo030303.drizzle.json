@@ -37,6 +37,9 @@
             "name": "drizzle",
             "buildsystem": "meson",
             "run-tests": true,
+            "config-opts": [
+                "-Dprofile=default"
+            ],
             "sources": [
                 {
                     "type": "dir",
