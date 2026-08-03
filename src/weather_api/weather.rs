@@ -6,8 +6,6 @@ pub struct WeatherApi {
 }
 
 const OPEN_METEO_BASE_URL: &str = "https://api.open-meteo.com/v1/forecast";
-// --- Unit Conversion ---
-const HPA_TO_INHG: f64 = 0.02953;
 
 #[derive(Debug, Deserialize)]
 pub struct WeatherResponse {
@@ -35,18 +33,137 @@ pub struct WeatherResponse {
     pub daily_units: Option<HashMap<String, String>>,
 }
 
+/// WMO Weather interpretation codes (WW)
+/// See https://open-meteo.com/en/docs#weather_variable_documentation
+pub enum WeatherCode {
+    ClearSky,
+    MainlyClear,
+    PartlyCloudy,
+    Overcast,
+    Fog,
+    DepositingRimeFog,
+    LightDrizzle,
+    ModerateDrizzle,
+    DenseDrizzle,
+    LightFreezingDrizzle,
+    DenseFreezingDrizzle,
+    LightRain,
+    ModerateRain,
+    HeavyRain,
+    LightFreezingRain,
+    HeavyFreezingRain,
+    LightSnowFall,
+    ModerateSnowFall,
+    HeavySnowFall,
+    SnowGrains,
+    LightRainShowers,
+    ModerateRainShowers,
+    ViolentRainShowers,
+    LightSnowShowers,
+    HeavySnowShowers,
+    Thunderstorm,
+    ThunderstormLightHail,
+    ThunderstormHeavyHail,
+}
+
+#[derive(Debug)]
+pub enum WeatherCodeError {
+    NoMatch,
+}
+
+impl WeatherCode {
+    pub fn get_icon_name(&self, is_day: bool) -> &'static str {
+        match self {
+            WeatherCode::ClearSky | WeatherCode::MainlyClear => {
+                if is_day {
+                    "clear-day"
+                } else {
+                    "clear-night"
+                }
+            }
+            WeatherCode::PartlyCloudy => {
+                if is_day {
+                    "partly-cloudy-day"
+                } else {
+                    "partly-cloudy-night"
+                }
+            }
+            WeatherCode::Overcast => "cloudy",
+            WeatherCode::Fog | WeatherCode::DepositingRimeFog => "foggy",
+            WeatherCode::LightRainShowers
+            | WeatherCode::ModerateRainShowers
+            | WeatherCode::ViolentRainShowers
+            | WeatherCode::LightDrizzle
+            | WeatherCode::ModerateDrizzle
+            | WeatherCode::DenseDrizzle
+            | WeatherCode::LightFreezingDrizzle
+            | WeatherCode::DenseFreezingDrizzle
+            | WeatherCode::LightRain
+            | WeatherCode::ModerateRain
+            | WeatherCode::HeavyRain
+            | WeatherCode::LightFreezingRain
+            | WeatherCode::HeavyFreezingRain => "rainy",
+            WeatherCode::LightSnowShowers
+            | WeatherCode::HeavySnowShowers
+            | WeatherCode::LightSnowFall
+            | WeatherCode::ModerateSnowFall
+            | WeatherCode::HeavySnowFall
+            | WeatherCode::SnowGrains => "snowing",
+            WeatherCode::Thunderstorm
+            | WeatherCode::ThunderstormLightHail
+            | WeatherCode::ThunderstormHeavyHail => "thunderstorm",
+        }
+    }
+}
+
+impl TryFrom<i64> for WeatherCode {
+    type Error = WeatherCodeError;
+
+    fn try_from(value: i64) -> Result<Self, Self::Error> {
+        match value {
+            0 => Ok(WeatherCode::ClearSky),
+            1 => Ok(WeatherCode::MainlyClear),
+            2 => Ok(WeatherCode::PartlyCloudy),
+            3 => Ok(WeatherCode::Overcast),
+            45 => Ok(WeatherCode::Fog),
+            48 => Ok(WeatherCode::DepositingRimeFog),
+            51 => Ok(WeatherCode::LightDrizzle),
+            53 => Ok(WeatherCode::ModerateDrizzle),
+            55 => Ok(WeatherCode::DenseDrizzle),
+            56 => Ok(WeatherCode::LightFreezingDrizzle),
+            57 => Ok(WeatherCode::DenseFreezingDrizzle),
+            61 => Ok(WeatherCode::LightRain),
+            63 => Ok(WeatherCode::ModerateRain),
+            65 => Ok(WeatherCode::HeavyRain),
+            66 => Ok(WeatherCode::LightFreezingRain),
+            67 => Ok(WeatherCode::HeavyFreezingRain),
+            71 => Ok(WeatherCode::LightSnowFall),
+            73 => Ok(WeatherCode::ModerateSnowFall),
+            75 => Ok(WeatherCode::HeavySnowFall),
+            77 => Ok(WeatherCode::SnowGrains),
+            80 => Ok(WeatherCode::LightRainShowers),
+            81 => Ok(WeatherCode::ModerateRainShowers),
+            82 => Ok(WeatherCode::ViolentRainShowers),
+            85 => Ok(WeatherCode::LightSnowShowers),
+            86 => Ok(WeatherCode::HeavySnowShowers),
+            95 => Ok(WeatherCode::Thunderstorm),
+            96 => Ok(WeatherCode::ThunderstormLightHail),
+            99 => Ok(WeatherCode::ThunderstormHeavyHail),
+            _ => Err(WeatherCodeError::NoMatch),
+        }
+    }
+}
+
 #[derive(Debug, Deserialize)]
 pub struct CurrentWeather {
     pub time: i64,
     pub interval: i64,
     pub temperature_2m: f64,
-    pub relativehumidity_2m: f64,
     pub apparent_temperature: f64,
     pub is_day: i64,
     pub uv_index: f64,
     pub precipitation: f64,
     pub weathercode: i64,
-    pub surface_pressure: f64,
     pub windspeed_10m: f64,
     pub winddirection_10m: f64,
 }
@@ -72,9 +189,7 @@ pub struct HourlyWeather {
     pub weathercode: Vec<i64>,
     pub precipitation: Vec<f64>,
     pub precipitation_probability: Vec<f64>,
-    pub visibility: Vec<f64>,
     pub windspeed_10m: Vec<f64>,
-    pub wind_direction_10m: Vec<f64>,
     pub uv_index: Vec<f64>,
     pub is_day: Vec<i64>,
 }
@@ -87,9 +202,7 @@ pub struct HourlyEntry {
     pub weathercode: i64,
     pub precipitation: f64,
     pub precipitation_probability: f64,
-    pub visibility: f64,
     pub windspeed_10m: f64,
-    pub wind_direction_10m: f64,
     pub uv_index: f64,
     pub is_day: i64,
 }
@@ -119,9 +232,7 @@ impl HourlyWeather {
                 weathercode: self.weathercode[i],
                 precipitation: self.precipitation[i],
                 precipitation_probability: self.precipitation_probability[i],
-                visibility: self.visibility[i],
                 windspeed_10m: self.windspeed_10m[i],
-                wind_direction_10m: self.wind_direction_10m[i],
                 uv_index: self.uv_index[i],
                 is_day: self.is_day[i],
             })
@@ -182,15 +293,13 @@ const DAILY_METRICS_LIST: [&str; 8] = [
     "windspeed_10m_max",
 ];
 
-const HOURLY_METRICS_LIST: [&str; 10] = [
+const HOURLY_METRICS_LIST: [&str; 8] = [
     "temperature_2m",
     "apparent_temperature",
     "weathercode",
     "precipitation",
     "precipitation_probability",
-    "visibility",
     "windspeed_10m",
-    "wind_direction_10m",
     "uv_index",
     "is_day",
 ];
@@ -225,19 +334,11 @@ impl WeatherApi {
         if !self.is_metric {
             weather_url.push_str("&temperature_unit=fahrenheit&wind_speed_unit=mph");
         }
-        let mut weather_data = reqwest::get(weather_url)
+        let weather_data = reqwest::get(weather_url)
             .await?
             .json::<WeatherResponse>()
             .await?;
 
-        if !self.is_metric {
-            if let Some(current) = weather_data.current.as_mut() {
-                current.surface_pressure *= HPA_TO_INHG;
-            }
-            if let Some(current_units) = weather_data.current_units.as_mut() {
-                current_units.insert("surface_pressure".to_string(), "inHg".to_string());
-            }
-        }
         Ok(weather_data)
     }
 }

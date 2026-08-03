@@ -16,6 +16,10 @@ use app::App;
 relm4::new_action_group!(AppActionGroup, "app");
 relm4::new_stateless_action!(QuitAction, AppActionGroup, "quit");
 
+mod icon_names {
+    include!(concat!(env!("OUT_DIR"), "/icon_names.rs"));
+}
+
 fn main() {
     gtk::init().unwrap();
 
@@ -29,6 +33,7 @@ fn main() {
     gettextrs::setlocale(LocaleCategory::LcAll, "");
     gettextrs::bindtextdomain(GETTEXT_PACKAGE, LOCALEDIR).expect("Unable to bind the text domain");
     gettextrs::textdomain(GETTEXT_PACKAGE).expect("Unable to switch to the text domain");
+    relm4_icons::initialize_icons(icon_names::GRESOURCE_BYTES, icon_names::RESOURCE_PREFIX);
 
     glib::set_application_name(&gettext("Aimsir"));
 
@@ -48,6 +53,7 @@ fn main() {
             gio::ResourceLookupFlags::NONE,
         )
         .unwrap();
+
     relm4::set_global_css(&glib::GString::from_utf8_checked(data.to_vec()).unwrap());
     app.visible_on_activate(false).run::<App>(());
 }
