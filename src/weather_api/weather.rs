@@ -202,15 +202,9 @@ impl TryFrom<i64> for WeatherCode {
 #[derive(Debug, Deserialize)]
 pub struct CurrentWeather {
     pub time: i64,
-    pub interval: i64,
     pub temperature_2m: f64,
-    pub apparent_temperature: f64,
     pub is_day: i64,
-    pub uv_index: f64,
-    pub precipitation: f64,
     pub weathercode: i64,
-    pub windspeed_10m: f64,
-    pub winddirection_10m: f64,
 }
 
 #[derive(Debug, Deserialize)]
@@ -319,16 +313,7 @@ pub enum ForecastTimeframe {
     Daily,
 }
 
-const CURRENT_METRICS_LIST: [&str; 8] = [
-    "temperature_2m",
-    "apparent_temperature",
-    "is_day",
-    "uv_index",
-    "precipitation",
-    "weathercode",
-    "windspeed_10m",
-    "winddirection_10m",
-];
+const CURRENT_METRICS_LIST: [&str; 3] = ["temperature_2m", "is_day", "weathercode"];
 
 const DAILY_METRICS_LIST: [&str; 9] = [
     "weathercode",

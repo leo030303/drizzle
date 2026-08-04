@@ -100,6 +100,45 @@ impl Component for App {
                         }
                     },
 
+                    gtk::Box {
+                        set_orientation: gtk::Orientation::Horizontal,
+                        set_margin_top: 10,
+
+                        gtk::Image {
+                            #[watch]
+                            set_icon_name: model.current_weather.as_ref().and_then(|current| WeatherCode::try_from(current.weathercode).ok().map(|weather_code| weather_code.get_icon_name(current.is_day == 1))),
+                            set_icon_size: gtk::IconSize::Inherit,
+                            set_pixel_size: 84,
+                            set_margin_all: 20,
+                        },
+                        gtk::Box {
+                            set_orientation: gtk::Orientation::Vertical,
+                            set_spacing: 10,
+                            gtk::ToggleButton {
+                                add_css_class: "text-button",
+                                add_css_class: "arrow-button",
+                                gtk::Box {
+                                    set_orientation: gtk::Orientation::Horizontal,
+                                    gtk::Label {
+                                        #[watch]
+                                        set_label: "Cork, Ireland",
+                                    },
+                                    gtk::Image {
+                                        set_icon_name: Some("down"),
+                                        set_icon_size: gtk::IconSize::Normal,
+                                        set_margin_horizontal: 10,
+                                    },
+
+                                },
+                            },
+                            gtk::Label {
+                                #[watch]
+                                set_label: &format!("{}℃", model.current_weather.as_ref().map(|current| current.temperature_2m.to_string()).unwrap_or_default()),
+                                add_css_class: "current-temp-label",
+                            },
+                        },
+                    },
+
                     gtk::Label {
                         set_label: "Hourly",
                         add_css_class: "title-1",
@@ -107,7 +146,6 @@ impl Component for App {
 
                     gtk::ScrolledWindow {
                         set_hexpand: true,
-                        set_height_request: 170,
                         set_propagate_natural_width: false,
                         set_policy: (gtk::PolicyType::Automatic, gtk::PolicyType::Never),
 
@@ -126,7 +164,6 @@ impl Component for App {
 
                     gtk::ScrolledWindow {
                         set_hexpand: true,
-                        set_height_request: 250,
                         set_propagate_natural_width: false,
                         set_policy: (gtk::PolicyType::Automatic, gtk::PolicyType::Never),
 

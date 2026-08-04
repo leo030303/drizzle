@@ -15,6 +15,11 @@ fn main() {
             "snowing",
             "clear-night",
             "partly-cloudy-night",
+            "down",
+            "daytime-sunrise",
+            "daytime-sunset",
+            "thermometer-gain",
+            "thermometer-loss",
         ],
     );
 }

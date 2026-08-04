@@ -8,6 +8,12 @@
   background-color: RGB(150 150 150 / 20%);
 }
 
+
+.current-temp-label {
+  font-size: 28pt;
+  font-weight: bold;
+}
+
 /* ------------------------------------------
    WEATHER DYNAMIC BACKGROUNDS (day & night)
    Prefix: .bg-weather-
