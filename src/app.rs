@@ -141,6 +141,7 @@ impl Component for App {
                                 set_label: &format!("Feels like {}℃", model.current_weather.as_ref().map(|current| current.apparent_temperature.to_string()).unwrap_or_default()),
                                 add_css_class: "current-apparent-temp-label",
                                 set_margin_bottom: 10,
+                                set_margin_start: 10,
                             },
                         },
                     },
@@ -159,7 +160,7 @@ impl Component for App {
                         hourly_box -> gtk::Box {
                             set_orientation: gtk::Orientation::Horizontal,
                             set_spacing: 5,
-                            set_margin_all: 5,
+                            set_margin_all: 10,
                         }
                     },
 
@@ -177,7 +178,7 @@ impl Component for App {
                         daily_box -> gtk::Box {
                             set_orientation: gtk::Orientation::Horizontal,
                             set_spacing: 5,
-                            set_margin_all: 5,
+                            set_margin_all: 10,
                         }
                     },
                 }
