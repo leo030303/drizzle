@@ -203,6 +203,7 @@ impl TryFrom<i64> for WeatherCode {
 pub struct CurrentWeather {
     pub time: i64,
     pub temperature_2m: f64,
+    pub apparent_temperature: f64,
     pub is_day: i64,
     pub weathercode: i64,
 }
@@ -225,7 +226,6 @@ pub struct DailyWeather {
 pub struct HourlyWeather {
     pub time: Vec<i64>,
     pub temperature_2m: Vec<f64>,
-    pub apparent_temperature: Vec<f64>,
     pub weathercode: Vec<i64>,
     pub precipitation: Vec<f64>,
     pub precipitation_probability: Vec<f64>,
@@ -238,7 +238,6 @@ pub struct HourlyWeather {
 pub struct HourlyEntry {
     pub time: i64,
     pub temperature_2m: f64,
-    pub apparent_temperature: f64,
     pub weathercode: i64,
     pub precipitation: f64,
     pub precipitation_probability: f64,
@@ -269,7 +268,6 @@ impl HourlyWeather {
             .map(|(i, &time)| HourlyEntry {
                 time,
                 temperature_2m: self.temperature_2m[i],
-                apparent_temperature: self.apparent_temperature[i],
                 weathercode: self.weathercode[i],
                 precipitation: self.precipitation[i],
                 precipitation_probability: self.precipitation_probability[i],
@@ -313,7 +311,12 @@ pub enum ForecastTimeframe {
     Daily,
 }
 
-const CURRENT_METRICS_LIST: [&str; 3] = ["temperature_2m", "is_day", "weathercode"];
+const CURRENT_METRICS_LIST: [&str; 4] = [
+    "temperature_2m",
+    "is_day",
+    "apparent_temperature",
+    "weathercode",
+];
 
 const DAILY_METRICS_LIST: [&str; 9] = [
     "weathercode",
@@ -327,9 +330,8 @@ const DAILY_METRICS_LIST: [&str; 9] = [
     "windspeed_10m_max",
 ];
 
-const HOURLY_METRICS_LIST: [&str; 8] = [
+const HOURLY_METRICS_LIST: [&str; 7] = [
     "temperature_2m",
-    "apparent_temperature",
     "weathercode",
     "precipitation",
     "precipitation_probability",

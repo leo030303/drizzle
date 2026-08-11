@@ -14,6 +14,10 @@
   font-weight: bold;
 }
 
+.current-apparent-temp-label {
+  font-size: 16pt;
+}
+
 /* ------------------------------------------
    WEATHER DYNAMIC BACKGROUNDS (day & night)
    Prefix: .bg-weather-

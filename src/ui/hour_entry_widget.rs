@@ -49,10 +49,6 @@ impl FactoryComponent for HourEntryWidget {
                 set_margin_horizontal: 5,
             },
             gtk::Label {
-                set_label: &format!("Feels like {}℃", self.forecast_data.apparent_temperature),
-                set_margin_horizontal: 5,
-            },
-            gtk::Label {
                 set_label: &format!("Rain: {}mm / {}%", self.forecast_data.precipitation, self.forecast_data.precipitation_probability),
                 set_margin_horizontal: 5,
             },
