@@ -300,7 +300,8 @@ impl DailyWeather {
     }
 }
 
-pub struct CityCoordinates {
+pub struct CityDetails {
+    pub name: String,
     pub latitude: f64,
     pub longitude: f64,
 }
@@ -347,7 +348,7 @@ impl WeatherApi {
 
     pub async fn get_weather(
         &self,
-        city_coordinates: CityCoordinates,
+        city_coordinates: CityDetails,
         forecast_timeframe: ForecastTimeframe,
     ) -> Result<WeatherResponse, Box<dyn std::error::Error>> {
         let mut weather_url = format!(

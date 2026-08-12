@@ -1,13 +1,18 @@
 use crate::config::APP_ID;
 use crate::modals::about::AboutDialog;
+use crate::modals::city_picker::CityPickerDialog;
+use crate::modals::city_picker::CityPickerDialogMsg;
 use crate::modals::shortcuts::ShortcutsDialog;
 use crate::ui::daily_entry_widget::DayEntryWidget;
 use crate::ui::hour_entry_widget::HourEntryWidget;
+use crate::weather_api::find_city::GeoResponse;
 use crate::weather_api::weather::CurrentWeather;
 use crate::weather_api::weather::DayEntry;
 use crate::weather_api::weather::HourlyEntry;
 use crate::weather_api::weather::WeatherCode;
 use crate::weather_api::{self, weather::WeatherApi};
+use relm4::ComponentController;
+use relm4::Controller;
 use relm4::{
     Component, ComponentParts, ComponentSender, RelmWidgetExt,
     actions::{AccelsPlus, RelmAction, RelmActionGroup},
@@ -29,10 +34,14 @@ pub struct App {
     hourly_entries: FactoryVecDeque<HourEntryWidget>,
     daily_entries: FactoryVecDeque<DayEntryWidget>,
     current_weather: Option<CurrentWeather>,
+    current_city: Option<GeoResponse>,
+    city_search_dialog: Controller<CityPickerDialog>,
 }
 
 #[derive(Debug)]
 pub enum AppMsg {
+    ShowCityPicker,
+    SelectCity(GeoResponse),
     RefreshWeatherData,
     SetWeatherData(Vec<HourlyEntry>, Vec<DayEntry>, CurrentWeather),
     Quit,
@@ -114,14 +123,18 @@ impl Component for App {
                         gtk::Box {
                             set_orientation: gtk::Orientation::Vertical,
                             set_spacing: 10,
-                            gtk::ToggleButton {
+                            #[local_ref]
+                            city_picker_button-> gtk::Button {
                                 add_css_class: "text-button",
                                 add_css_class: "arrow-button",
+                                connect_clicked[sender] => move |_| {
+                                    sender.input(AppMsg::ShowCityPicker);
+                                },
                                 gtk::Box {
                                     set_orientation: gtk::Orientation::Horizontal,
                                     gtk::Label {
                                         #[watch]
-                                        set_label: "Cork, Ireland",
+                                        set_label: &model.current_city.as_ref().map(|geo| geo.name.clone()).unwrap_or(String::from("Select A City")),
                                     },
                                     gtk::Image {
                                         set_icon_name: Some("down"),
@@ -205,10 +218,20 @@ impl Component for App {
             hourly_entries,
             daily_entries,
             current_weather: None,
+            current_city: None,
+            city_search_dialog: CityPickerDialog::builder()
+                .launch(())
+                .forward(sender.input_sender(), |response| response),
         };
         let hourly_box = model.hourly_entries.widget();
         let daily_box = model.daily_entries.widget();
+        let city_picker_button = gtk::Button::new();
         let widgets = view_output!();
+
+        model
+            .city_search_dialog
+            .widget()
+            .set_parent(&widgets.city_picker_button);
 
         let app = root.application().unwrap();
         let mut actions = RelmActionGroup::<WindowActionGroup>::new();
@@ -254,51 +277,67 @@ impl Component for App {
         match message {
             AppMsg::RefreshWeatherData => {
                 self.is_loading = true;
-                sender.oneshot_command(async move {
-                    let weather_api = WeatherApi::init(true);
-                    let weather_results = weather_api
-                        .get_weather(
-                            weather_api::weather::CityCoordinates {
-                                latitude: 51.908481,
-                                longitude: -8.475720,
-                            },
-                            weather_api::weather::ForecastTimeframe::Daily,
-                        )
-                        .await;
-                    let daily_entries = weather_results.unwrap().daily.unwrap().to_entries();
-                    let weather_results = weather_api
-                        .get_weather(
-                            weather_api::weather::CityCoordinates {
-                                latitude: 51.908481,
-                                longitude: -8.475720,
-                            },
-                            weather_api::weather::ForecastTimeframe::Hourly,
-                        )
-                        .await;
-                    let hourly_entries = weather_results.unwrap().hourly.unwrap().to_entries();
-                    let weather_results = weather_api
-                        .get_weather(
-                            weather_api::weather::CityCoordinates {
-                                latitude: 51.908481,
-                                longitude: -8.475720,
-                            },
-                            weather_api::weather::ForecastTimeframe::Current,
-                        )
-                        .await;
-                    let current_weather = weather_results.unwrap().current.unwrap();
-                    AppMsg::SetWeatherData(hourly_entries, daily_entries, current_weather)
-                });
+                if let Some(current_city) = self.current_city.clone() {
+                    sender.oneshot_command(async move {
+                        let weather_api = WeatherApi::init(true);
+                        let weather_results = weather_api
+                            .get_weather(
+                                weather_api::weather::CityDetails {
+                                    name: current_city.name.clone(),
+                                    latitude: current_city.latitude,
+                                    longitude: current_city.longitude,
+                                },
+                                weather_api::weather::ForecastTimeframe::Daily,
+                            )
+                            .await;
+                        let daily_entries = weather_results.unwrap().daily.unwrap().to_entries();
+                        let weather_results = weather_api
+                            .get_weather(
+                                weather_api::weather::CityDetails {
+                                    name: current_city.name.clone(),
+                                    latitude: current_city.latitude,
+                                    longitude: current_city.longitude,
+                                },
+                                weather_api::weather::ForecastTimeframe::Hourly,
+                            )
+                            .await;
+                        let hourly_entries = weather_results.unwrap().hourly.unwrap().to_entries();
+                        let weather_results = weather_api
+                            .get_weather(
+                                weather_api::weather::CityDetails {
+                                    name: current_city.name.clone(),
+                                    latitude: current_city.latitude,
+                                    longitude: current_city.longitude,
+                                },
+                                weather_api::weather::ForecastTimeframe::Current,
+                            )
+                            .await;
+                        let current_weather = weather_results.unwrap().current.unwrap();
+                        AppMsg::SetWeatherData(hourly_entries, daily_entries, current_weather)
+                    });
+                } else {
+                    self.is_loading = false;
+                }
             }
             AppMsg::Quit => main_application().quit(),
             AppMsg::SetWeatherData(hour_entries, day_entries, current_weather) => {
+                self.hourly_entries.guard().clear();
                 for entry in hour_entries {
                     self.hourly_entries.guard().push_back(entry);
                 }
+                self.daily_entries.guard().clear();
                 for entry in day_entries {
                     self.daily_entries.guard().push_back(entry);
                 }
                 self.current_weather = Some(current_weather);
                 self.is_loading = false;
+            }
+            AppMsg::ShowCityPicker => {
+                self.city_search_dialog.emit(CityPickerDialogMsg::Show);
+            }
+            AppMsg::SelectCity(selected_city) => {
+                self.current_city = Some(selected_city);
+                sender.input(AppMsg::RefreshWeatherData);
             }
         }
     }
