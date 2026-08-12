@@ -36,6 +36,7 @@ pub struct App {
     current_weather: Option<CurrentWeather>,
     current_city: Option<GeoResponse>,
     city_search_dialog: Controller<CityPickerDialog>,
+    city_picker_button: gtk::Button,
 }
 
 #[derive(Debug)]
@@ -89,6 +90,32 @@ impl Component for App {
                     set_height_request: 64,
                 }
 
+            } else if model.current_city.is_none() {
+                gtk::Box {
+                    set_orientation: gtk::Orientation::Vertical,
+
+                    adw::HeaderBar {
+                        pack_end = &gtk::MenuButton {
+                            set_icon_name: "open-menu-symbolic",
+                            set_menu_model: Some(&primary_menu),
+                        }
+                    },
+                    adw::StatusPage {
+                        set_icon_name: Some("system-search-symbolic"),
+                        set_title: "No City Selected",
+                        set_description: Some("Search to find your local city"),
+                        set_hexpand: true,
+                        set_vexpand: true,
+                        #[local_ref]
+                        none_selected_city_picker_button -> gtk::Button {
+                            set_label: "Search",
+                            add_css_class: "pill",
+                            add_css_class: "suggested-action",
+                            set_halign: gtk::Align::Center,
+                            connect_clicked => AppMsg::ShowCityPicker,
+                        }
+                    }
+                }
             } else {
 
                 gtk::Box {
@@ -219,19 +246,28 @@ impl Component for App {
             daily_entries,
             current_weather: None,
             current_city: None,
+            city_picker_button: gtk::Button::new(),
             city_search_dialog: CityPickerDialog::builder()
                 .launch(())
                 .forward(sender.input_sender(), |response| response),
         };
         let hourly_box = model.hourly_entries.widget();
         let daily_box = model.daily_entries.widget();
-        let city_picker_button = gtk::Button::new();
+        let city_picker_button = model.city_picker_button.clone();
+        let none_selected_city_picker_button = gtk::Button::new();
         let widgets = view_output!();
 
-        model
-            .city_search_dialog
-            .widget()
-            .set_parent(&widgets.city_picker_button);
+        if model.current_city.is_some() {
+            model
+                .city_search_dialog
+                .widget()
+                .set_parent(&widgets.city_picker_button);
+        } else {
+            model
+                .city_search_dialog
+                .widget()
+                .set_parent(&widgets.none_selected_city_picker_button);
+        }
 
         let app = root.application().unwrap();
         let mut actions = RelmActionGroup::<WindowActionGroup>::new();
@@ -336,6 +372,13 @@ impl Component for App {
                 self.city_search_dialog.emit(CityPickerDialogMsg::Show);
             }
             AppMsg::SelectCity(selected_city) => {
+                if self.current_city.is_none() {
+                    self.city_search_dialog.widget().unparent();
+
+                    self.city_search_dialog
+                        .widget()
+                        .set_parent(&self.city_picker_button);
+                }
                 self.current_city = Some(selected_city);
                 sender.input(AppMsg::RefreshWeatherData);
             }
