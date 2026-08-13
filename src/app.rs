@@ -1,6 +1,7 @@
 use crate::config::APP_ID;
 use crate::modals::about::AboutDialog;
 use crate::modals::city_picker::CityPickerDialog;
+use crate::modals::city_picker::CityPickerDialogMsg;
 use crate::modals::shortcuts::ShortcutsDialog;
 use crate::ui::daily_entry_widget::DayEntryWidget;
 use crate::ui::hour_entry_widget::HourEntryWidget;
@@ -13,6 +14,7 @@ use crate::weather_api::{self, weather::WeatherApi};
 use relm4::ComponentController;
 use relm4::Controller;
 use relm4::adw::prelude::AdwDialogExt;
+use relm4::gtk::gio::prelude::SettingsExtManual;
 use relm4::{
     Component, ComponentParts, ComponentSender, RelmWidgetExt,
     actions::{AccelsPlus, RelmAction, RelmActionGroup},
@@ -36,6 +38,7 @@ pub struct App {
     current_weather: Option<CurrentWeather>,
     current_city: Option<GeoResponse>,
     city_search_dialog: Controller<CityPickerDialog>,
+    recent_cities: Vec<GeoResponse>,
 }
 
 #[derive(Debug)]
@@ -239,7 +242,7 @@ impl Component for App {
         let daily_entries: FactoryVecDeque<DayEntryWidget> = FactoryVecDeque::builder()
             .launch(gtk::Box::default())
             .forward(sender.input_sender(), |output| output);
-        let model = Self {
+        let mut model = Self {
             is_loading: false,
             hourly_entries,
             daily_entries,
@@ -248,6 +251,7 @@ impl Component for App {
             city_search_dialog: CityPickerDialog::builder()
                 .launch(())
                 .forward(sender.input_sender(), |response| response),
+            recent_cities: vec![],
         };
         let hourly_box = model.hourly_entries.widget();
         let daily_box = model.daily_entries.widget();
@@ -288,7 +292,7 @@ impl Component for App {
         actions.add_action(quit_action);
         actions.register_for_widget(&widgets.main_window);
 
-        widgets.load_window_size();
+        widgets.load_app_state(&mut model);
 
         sender.input(AppMsg::RefreshWeatherData);
 
@@ -355,10 +359,20 @@ impl Component for App {
                 self.is_loading = false;
             }
             AppMsg::ShowCityPicker => {
+                self.city_search_dialog
+                    .emit(CityPickerDialogMsg::SetRecentCities(
+                        self.recent_cities.clone(),
+                    ));
                 self.city_search_dialog.widget().present(Some(root));
             }
             AppMsg::SelectCity(selected_city) => {
-                self.current_city = Some(selected_city);
+                self.current_city = Some(selected_city.clone());
+                if !self.recent_cities.contains(&selected_city) {
+                    self.recent_cities.insert(0, selected_city);
+                }
+                if self.recent_cities.len() > 5 {
+                    self.recent_cities.pop();
+                }
                 sender.input(AppMsg::RefreshWeatherData);
             }
         }
@@ -374,12 +388,12 @@ impl Component for App {
     }
 
     fn shutdown(&mut self, widgets: &mut Self::Widgets, _output: relm4::Sender<Self::Output>) {
-        widgets.save_window_size().unwrap();
+        widgets.save_app_state(self).unwrap();
     }
 }
 
 impl AppWidgets {
-    fn save_window_size(&self) -> Result<(), glib::BoolError> {
+    fn save_app_state(&self, model: &App) -> Result<(), glib::BoolError> {
         let settings = gio::Settings::new(APP_ID);
         let (width, height) = self.main_window.default_size();
 
@@ -387,12 +401,30 @@ impl AppWidgets {
         settings.set_int("window-height", height)?;
 
         settings.set_boolean("is-maximized", self.main_window.is_maximized())?;
+        settings.set_strv(
+            "recent-cities",
+            model
+                .recent_cities
+                .iter()
+                .filter_map(|item| serde_json::to_string(item).ok())
+                .collect::<Vec<String>>(),
+        )?;
 
         Ok(())
     }
 
-    fn load_window_size(&self) {
+    fn load_app_state(&self, model: &mut App) {
         let settings = gio::Settings::new(APP_ID);
+        let recent_cities: Vec<GeoResponse> = settings
+            .strv("recent-cities")
+            .iter()
+            .filter_map(|item| {
+                let deserialised: Option<GeoResponse> = serde_json::from_str(item).ok();
+                deserialised
+            })
+            .collect();
+        model.recent_cities = recent_cities;
+        model.current_city = model.recent_cities.first().cloned();
 
         let width = settings.int("window-width");
         let height = settings.int("window-height");

@@ -44,6 +44,7 @@ impl FactoryComponent for CitySearchResultRow {
 
                 gtk::Label {
                     set_halign: gtk::Align::Start,
+                    set_wrap: true,
                     #[watch]
                     set_label: &format!(
                         "{}, {}",

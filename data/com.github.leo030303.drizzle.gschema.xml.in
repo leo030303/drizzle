@@ -13,5 +13,9 @@
       <default>false</default>
       <summary>Window maximized state</summary>
     </key>
+    <key name="recent-cities" type="as">
+      <default>[]</default>
+      <summary>JSON objects of GeoResponses for recent cities</summary>
+    </key>
   </schema>
 </schemalist>
