@@ -123,12 +123,9 @@ impl Component for App {
 
                 gtk::Box {
                     set_orientation: gtk::Orientation::Vertical,
-                    #[watch]
-                    add_css_class?: model.current_weather.as_ref().map(|current_weather| current_weather.weathercode.get_background_css_class()),
 
 
                     adw::HeaderBar {
-                        add_css_class: "bg-transparency",
                         pack_start = &gtk::Button {
                             set_icon_name: "view-refresh-symbolic",
                             connect_clicked => AppMsg::RefreshWeatherData

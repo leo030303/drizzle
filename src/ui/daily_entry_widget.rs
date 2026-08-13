@@ -21,7 +21,8 @@ impl FactoryComponent for DayEntryWidget {
         gtk::Box{
             set_orientation: gtk::Orientation::Vertical,
             add_css_class: "card",
-            add_css_class: "bg-transparency",
+            add_css_class: "weather-card",
+            add_css_class: self.forecast_data.weathercode.get_background_css_class(true),
             set_spacing: 5,
             gtk::Box{
                 set_orientation: gtk::Orientation::Horizontal,

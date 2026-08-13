@@ -79,34 +79,82 @@ impl WeatherCode {
             WeatherCode::NoMatch => "",
         }
     }
-    pub fn get_background_css_class(&self) -> &'static str {
+    pub fn get_background_css_class(&self, is_day: bool) -> &'static str {
         match self {
-            WeatherCode::ClearSky | WeatherCode::MainlyClear => "bg-weather-clear-sky",
-            WeatherCode::PartlyCloudy => "bg-weather-few-clouds",
-            WeatherCode::Overcast => "bg-weather-overcast",
-            WeatherCode::Fog | WeatherCode::DepositingRimeFog => "bg-weather-fog",
+            WeatherCode::ClearSky | WeatherCode::MainlyClear => {
+                if is_day {
+                    "bg-weather-clear-sky"
+                } else {
+                    "bg-weather-clear-sky-night"
+                }
+            }
+            WeatherCode::PartlyCloudy => {
+                if is_day {
+                    "bg-weather-few-clouds"
+                } else {
+                    "bg-weather-few-clouds-night"
+                }
+            }
+            WeatherCode::Overcast => {
+                if is_day {
+                    "bg-weather-overcast"
+                } else {
+                    "bg-weather-overcast-night"
+                }
+            }
+            WeatherCode::Fog | WeatherCode::DepositingRimeFog => {
+                if is_day {
+                    "bg-weather-fog"
+                } else {
+                    "bg-weather-fog-night"
+                }
+            }
             WeatherCode::LightRainShowers
             | WeatherCode::LightDrizzle
             | WeatherCode::ModerateDrizzle
             | WeatherCode::LightFreezingDrizzle
             | WeatherCode::LightRain
-            | WeatherCode::LightFreezingRain => "bg-weather-showers-scattered",
+            | WeatherCode::LightFreezingRain => {
+                if is_day {
+                    "bg-weather-showers-scattered"
+                } else {
+                    "bg-weather-showers-scattered-night"
+                }
+            }
             WeatherCode::ModerateRain
             | WeatherCode::HeavyRain
             | WeatherCode::DenseFreezingDrizzle
             | WeatherCode::DenseDrizzle
             | WeatherCode::ModerateRainShowers
             | WeatherCode::ViolentRainShowers
-            | WeatherCode::HeavyFreezingRain => "bg-weather-showers-large",
+            | WeatherCode::HeavyFreezingRain => {
+                if is_day {
+                    "bg-weather-showers-large"
+                } else {
+                    "bg-weather-showers-large-night"
+                }
+            }
             WeatherCode::LightSnowShowers
             | WeatherCode::HeavySnowShowers
             | WeatherCode::LightSnowFall
             | WeatherCode::ModerateSnowFall
             | WeatherCode::HeavySnowFall
-            | WeatherCode::SnowGrains => "bg-weather-snow",
+            | WeatherCode::SnowGrains => {
+                if is_day {
+                    "bg-weather-snow"
+                } else {
+                    "bg-weather-snow-night"
+                }
+            }
             WeatherCode::Thunderstorm
             | WeatherCode::ThunderstormLightHail
-            | WeatherCode::ThunderstormHeavyHail => "bg-weather-storm",
+            | WeatherCode::ThunderstormHeavyHail => {
+                if is_day {
+                    "bg-weather-storm"
+                } else {
+                    "bg-weather-storm-night"
+                }
+            }
             WeatherCode::NoMatch => "",
         }
     }

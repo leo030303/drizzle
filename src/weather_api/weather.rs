@@ -1,6 +1,6 @@
 use serde::Deserialize;
 
-use crate::weather_api::{find_city::GeoResponse, weather_code::WeatherCode};
+use crate::weather_api::{find_city::GeoResponse, uv_index::UvIndex, weather_code::WeatherCode};
 
 const OPEN_METEO_BASE_URL: &str = "https://api.open-meteo.com/v1/forecast";
 
@@ -79,7 +79,7 @@ pub struct HourlyEntry {
     pub precipitation: f64,
     pub precipitation_probability: f64,
     pub windspeed_10m: f64,
-    pub uv_index: f64,
+    pub uv_index: UvIndex,
     pub is_day: bool,
 }
 
@@ -91,7 +91,7 @@ pub struct DailyEntry {
     pub temperature_2m_min: f64,
     pub sunrise: i64,
     pub sunset: i64,
-    pub uv_index_max: f64,
+    pub uv_index_max: UvIndex,
     pub precipitation_sum: f64,
     pub precipitation_probability_max: f64,
     pub windspeed_10m_max: f64,
@@ -109,7 +109,7 @@ impl HourlyWeatherRaw {
                 precipitation: self.precipitation[i],
                 precipitation_probability: self.precipitation_probability[i],
                 windspeed_10m: self.windspeed_10m[i],
-                uv_index: self.uv_index[i],
+                uv_index: UvIndex::from(self.uv_index[i]),
                 is_day: self.is_day[i] == 1,
             })
             .collect()
@@ -128,7 +128,7 @@ impl DailyWeatherRaw {
                 temperature_2m_min: self.temperature_2m_min[i],
                 sunrise: self.sunrise[i] + utc_offset,
                 sunset: self.sunset[i] + utc_offset,
-                uv_index_max: self.uv_index_max[i],
+                uv_index_max: UvIndex::from(self.uv_index_max[i]),
                 precipitation_sum: self.precipitation_sum[i],
                 precipitation_probability_max: self.precipitation_probability_max[i],
                 windspeed_10m_max: self.windspeed_10m_max[i],
