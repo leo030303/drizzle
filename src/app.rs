@@ -182,7 +182,7 @@ impl Component for App {
                                 set_label: &format!("Feels like {}℃", model.current_weather.as_ref().map(|current| current.apparent_temperature.to_string()).unwrap_or_default()),
                                 add_css_class: "current-apparent-temp-label",
                                 set_margin_bottom: 10,
-                                set_margin_start: 10,
+                                set_margin_start: 30,
                             },
                         },
                     },
