@@ -154,21 +154,19 @@ impl Component for App {
                             set_spacing: 10,
                             #[local_ref]
                             city_picker_button-> gtk::Button {
-                                add_css_class: "text-button",
-                                add_css_class: "arrow-button",
                                 connect_clicked[sender] => move |_| {
                                     sender.input(AppMsg::ShowCityPicker);
                                 },
                                 gtk::Box {
                                     set_orientation: gtk::Orientation::Horizontal,
+                                    gtk::Image {
+                                        set_icon_name: Some("mark-location-symbolic"),
+                                        set_icon_size: gtk::IconSize::Normal,
+                                        set_margin_horizontal: 10,
+                                    },
                                     gtk::Label {
                                         #[watch]
                                         set_label: &model.current_city.as_ref().map(|geo| geo.name.clone()).unwrap_or(String::from("Select A City")),
-                                    },
-                                    gtk::Image {
-                                        set_icon_name: Some("down"),
-                                        set_icon_size: gtk::IconSize::Normal,
-                                        set_margin_horizontal: 10,
                                     },
 
                                 },

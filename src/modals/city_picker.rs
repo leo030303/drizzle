@@ -52,6 +52,7 @@ impl Component for CityPickerDialog {
                     gtk::Box {
                         set_orientation: gtk::Orientation::Horizontal,
                         set_spacing: 5,
+                        set_halign: gtk::Align::Center,
                         #[name = "search_entry"]
                         gtk::SearchEntry {
                             set_placeholder_text: Some("Search for a city"),
