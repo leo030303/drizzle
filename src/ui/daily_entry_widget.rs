@@ -3,18 +3,15 @@ use relm4::{
     prelude::*,
 };
 
-use crate::{
-    app::AppMsg,
-    weather_api::weather::{DayEntry, WeatherCode},
-};
+use crate::{app::AppMsg, weather_api::weather::DailyEntry};
 
 pub struct DayEntryWidget {
-    pub forecast_data: DayEntry,
+    pub forecast_data: DailyEntry,
 }
 
 #[relm4::factory(pub)]
 impl FactoryComponent for DayEntryWidget {
-    type Init = DayEntry;
+    type Init = DailyEntry;
     type Input = ();
     type Output = AppMsg;
     type CommandOutput = ();
@@ -32,7 +29,7 @@ impl FactoryComponent for DayEntryWidget {
                 set_margin_top: 10,
                 set_margin_horizontal: 10,
                 gtk::Image {
-                    set_icon_name: Some(WeatherCode::try_from(self.forecast_data.weathercode).unwrap().get_icon_name(true)),
+                    set_icon_name: Some(self.forecast_data.weathercode.get_icon_name(true)),
                     set_icon_size: gtk::IconSize::Large,
                 },
                 gtk::Label {

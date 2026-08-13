@@ -3,10 +3,7 @@ use relm4::{
     prelude::*,
 };
 
-use crate::{
-    app::AppMsg,
-    weather_api::weather::{HourlyEntry, WeatherCode},
-};
+use crate::{app::AppMsg, weather_api::weather::HourlyEntry};
 
 pub struct HourEntryWidget {
     pub forecast_data: HourlyEntry,
@@ -35,7 +32,7 @@ impl FactoryComponent for HourEntryWidget {
                 set_hexpand: true,
                 set_halign: gtk::Align::Center,
                 gtk::Image {
-                    set_icon_name: Some(WeatherCode::try_from(self.forecast_data.weathercode).unwrap().get_icon_name(self.forecast_data.is_day == 1)),
+                    set_icon_name: Some(self.forecast_data.weathercode.get_icon_name(self.forecast_data.is_day)),
                     set_icon_size: gtk::IconSize::Large,
                 },
                 gtk::Label {

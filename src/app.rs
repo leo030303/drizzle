@@ -7,10 +7,11 @@ use crate::ui::daily_entry_widget::DayEntryWidget;
 use crate::ui::hour_entry_widget::HourEntryWidget;
 use crate::weather_api::find_city::GeoResponse;
 use crate::weather_api::weather::CurrentWeather;
-use crate::weather_api::weather::DayEntry;
+use crate::weather_api::weather::DailyEntry;
 use crate::weather_api::weather::HourlyEntry;
-use crate::weather_api::weather::WeatherCode;
-use crate::weather_api::{self, weather::WeatherApi};
+use crate::weather_api::weather::get_weather_current;
+use crate::weather_api::weather::get_weather_daily;
+use crate::weather_api::weather::get_weather_hourly;
 use relm4::ComponentController;
 use relm4::Controller;
 use relm4::adw::prelude::AdwDialogExt;
@@ -46,7 +47,7 @@ pub enum AppMsg {
     ShowCityPicker,
     SelectCity(GeoResponse),
     RefreshWeatherData,
-    SetWeatherData(Vec<HourlyEntry>, Vec<DayEntry>, CurrentWeather),
+    SetWeatherData(Vec<HourlyEntry>, Vec<DailyEntry>, CurrentWeather),
     Quit,
 }
 
@@ -123,7 +124,7 @@ impl Component for App {
                 gtk::Box {
                     set_orientation: gtk::Orientation::Vertical,
                     #[watch]
-                    add_css_class?: model.current_weather.as_ref().map(|current_weather| WeatherCode::try_from(current_weather.weathercode).unwrap().get_background_css_class()),
+                    add_css_class?: model.current_weather.as_ref().map(|current_weather| current_weather.weathercode.get_background_css_class()),
 
 
                     adw::HeaderBar {
@@ -144,7 +145,7 @@ impl Component for App {
 
                         gtk::Image {
                             #[watch]
-                            set_icon_name: model.current_weather.as_ref().and_then(|current| WeatherCode::try_from(current.weathercode).ok().map(|weather_code| weather_code.get_icon_name(current.is_day == 1))),
+                            set_icon_name: model.current_weather.as_ref().map(|current| current.weathercode.get_icon_name(current.is_day)),
                             set_icon_size: gtk::IconSize::Inherit,
                             set_pixel_size: 84,
                             set_margin_all: 20,
@@ -303,40 +304,13 @@ impl Component for App {
                 self.is_loading = true;
                 if let Some(current_city) = self.current_city.clone() {
                     sender.oneshot_command(async move {
-                        let weather_api = WeatherApi::init(true);
-                        let weather_results = weather_api
-                            .get_weather(
-                                weather_api::weather::CityDetails {
-                                    name: current_city.name.clone(),
-                                    latitude: current_city.latitude,
-                                    longitude: current_city.longitude,
-                                },
-                                weather_api::weather::ForecastTimeframe::Daily,
-                            )
-                            .await;
-                        let daily_entries = weather_results.unwrap().daily.unwrap().to_entries();
-                        let weather_results = weather_api
-                            .get_weather(
-                                weather_api::weather::CityDetails {
-                                    name: current_city.name.clone(),
-                                    latitude: current_city.latitude,
-                                    longitude: current_city.longitude,
-                                },
-                                weather_api::weather::ForecastTimeframe::Hourly,
-                            )
-                            .await;
-                        let hourly_entries = weather_results.unwrap().hourly.unwrap().to_entries();
-                        let weather_results = weather_api
-                            .get_weather(
-                                weather_api::weather::CityDetails {
-                                    name: current_city.name.clone(),
-                                    latitude: current_city.latitude,
-                                    longitude: current_city.longitude,
-                                },
-                                weather_api::weather::ForecastTimeframe::Current,
-                            )
-                            .await;
-                        let current_weather = weather_results.unwrap().current.unwrap();
+                        let is_metric = true;
+                        let current_weather =
+                            get_weather_current(&current_city, is_metric).await.unwrap();
+                        let hourly_entries =
+                            get_weather_hourly(&current_city, is_metric).await.unwrap();
+                        let daily_entries =
+                            get_weather_daily(&current_city, is_metric).await.unwrap();
                         AppMsg::SetWeatherData(hourly_entries, daily_entries, current_weather)
                     });
                 } else {
