@@ -1,8 +1,9 @@
 use relm4::{
     Component, ComponentParts, ComponentSender, RelmWidgetExt,
+    adw::{self, prelude::AdwDialogExt},
     gtk::{
         self,
-        prelude::{BoxExt, ButtonExt, EditableExt, OrientableExt, PopoverExt, WidgetExt},
+        prelude::{BoxExt, ButtonExt, EditableExt, OrientableExt, WidgetExt},
     },
     prelude::FactoryVecDeque,
 };
@@ -23,7 +24,6 @@ pub enum CityPickerDialogMsg {
     SearchQueryChanged(String),
     SearchCities,
     SelectCity(GeoResponse),
-    Show,
 }
 
 #[relm4::component(pub)]
@@ -35,35 +35,42 @@ impl Component for CityPickerDialog {
     type Widgets = CityPickerWidgets;
 
     view! {
-        gtk::Popover {
-            gtk::Box {
-                set_orientation: gtk::Orientation::Vertical,
-                set_spacing: 10,
-                set_margin_all: 20,
+        adw::Dialog {
+            #[wrap(Some)]
+            set_child = &adw::ToolbarView {
+                add_top_bar = &adw::HeaderBar {},
+                #[wrap(Some)]
+                set_content = &gtk::Box{
+                    set_orientation: gtk::Orientation::Vertical,
+                    set_spacing: 10,
+                    set_margin_all: 20,
 
-                gtk::Box {
-                    set_orientation: gtk::Orientation::Horizontal,
-                    set_spacing: 5,
-                    gtk::SearchEntry {
-                        set_placeholder_text: Some("Search for a city"),
-                        connect_activate => CityPickerDialogMsg::SearchCities,
-                        connect_search_changed[sender] => move |entry| {
-                            sender.input(CityPickerDialogMsg::SearchQueryChanged(entry.text().to_string()));
+
+                    gtk::Box {
+                        set_orientation: gtk::Orientation::Horizontal,
+                        set_spacing: 5,
+                        gtk::SearchEntry {
+                            set_placeholder_text: Some("Search for a city"),
+                            connect_activate => CityPickerDialogMsg::SearchCities,
+                            connect_search_changed[sender] => move |entry| {
+                                sender.input(CityPickerDialogMsg::SearchQueryChanged(entry.text().to_string()));
+                            },
+                        },
+                        gtk::Button {
+                            set_icon_name: "system-search-symbolic",
+                            connect_clicked => CityPickerDialogMsg::SearchCities
                         },
                     },
-                    gtk::Button {
-                        set_icon_name: "system-search-symbolic",
-                        connect_clicked => CityPickerDialogMsg::SearchCities
+
+                    #[local_ref]
+                    city_list -> gtk::ListBox {
+                        set_selection_mode: gtk::SelectionMode::None,
+                        add_css_class: "boxed-list",
+                        set_margin_all: 10,
                     },
                 },
 
-                #[local_ref]
-                city_list -> gtk::ListBox {
-                    set_selection_mode: gtk::SelectionMode::None,
-                    add_css_class: "boxed-list",
-                    set_margin_all: 10,
                 },
-            }
         }
     }
 
@@ -103,10 +110,7 @@ impl Component for CityPickerDialog {
             }
             CityPickerDialogMsg::SelectCity(city) => {
                 sender.output(AppMsg::SelectCity(city)).unwrap();
-            }
-
-            CityPickerDialogMsg::Show => {
-                root.popup();
+                root.close();
             }
         }
     }

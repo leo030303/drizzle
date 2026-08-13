@@ -1,7 +1,6 @@
 use crate::config::APP_ID;
 use crate::modals::about::AboutDialog;
 use crate::modals::city_picker::CityPickerDialog;
-use crate::modals::city_picker::CityPickerDialogMsg;
 use crate::modals::shortcuts::ShortcutsDialog;
 use crate::ui::daily_entry_widget::DayEntryWidget;
 use crate::ui::hour_entry_widget::HourEntryWidget;
@@ -13,6 +12,7 @@ use crate::weather_api::weather::WeatherCode;
 use crate::weather_api::{self, weather::WeatherApi};
 use relm4::ComponentController;
 use relm4::Controller;
+use relm4::adw::prelude::AdwDialogExt;
 use relm4::{
     Component, ComponentParts, ComponentSender, RelmWidgetExt,
     actions::{AccelsPlus, RelmAction, RelmActionGroup},
@@ -36,7 +36,6 @@ pub struct App {
     current_weather: Option<CurrentWeather>,
     current_city: Option<GeoResponse>,
     city_search_dialog: Controller<CityPickerDialog>,
-    city_picker_button: gtk::Button,
 }
 
 #[derive(Debug)]
@@ -246,28 +245,15 @@ impl Component for App {
             daily_entries,
             current_weather: None,
             current_city: None,
-            city_picker_button: gtk::Button::new(),
             city_search_dialog: CityPickerDialog::builder()
                 .launch(())
                 .forward(sender.input_sender(), |response| response),
         };
         let hourly_box = model.hourly_entries.widget();
         let daily_box = model.daily_entries.widget();
-        let city_picker_button = model.city_picker_button.clone();
+        let city_picker_button = gtk::Button::new();
         let none_selected_city_picker_button = gtk::Button::new();
         let widgets = view_output!();
-
-        if model.current_city.is_some() {
-            model
-                .city_search_dialog
-                .widget()
-                .set_parent(&widgets.city_picker_button);
-        } else {
-            model
-                .city_search_dialog
-                .widget()
-                .set_parent(&widgets.none_selected_city_picker_button);
-        }
 
         let app = root.application().unwrap();
         let mut actions = RelmActionGroup::<WindowActionGroup>::new();
@@ -309,7 +295,7 @@ impl Component for App {
         ComponentParts { model, widgets }
     }
 
-    fn update(&mut self, message: Self::Input, sender: ComponentSender<Self>, _root: &Self::Root) {
+    fn update(&mut self, message: Self::Input, sender: ComponentSender<Self>, root: &Self::Root) {
         match message {
             AppMsg::RefreshWeatherData => {
                 self.is_loading = true;
@@ -369,16 +355,9 @@ impl Component for App {
                 self.is_loading = false;
             }
             AppMsg::ShowCityPicker => {
-                self.city_search_dialog.emit(CityPickerDialogMsg::Show);
+                self.city_search_dialog.widget().present(Some(root));
             }
             AppMsg::SelectCity(selected_city) => {
-                if self.current_city.is_none() {
-                    self.city_search_dialog.widget().unparent();
-
-                    self.city_search_dialog
-                        .widget()
-                        .set_parent(&self.city_picker_button);
-                }
                 self.current_city = Some(selected_city);
                 sender.input(AppMsg::RefreshWeatherData);
             }
