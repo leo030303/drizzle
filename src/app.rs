@@ -146,7 +146,12 @@ impl Component for App {
                             set_orientation: gtk::Orientation::Vertical,
                             gtk::Box {
                                 set_orientation: gtk::Orientation::Horizontal,
-                                set_margin_top: 10,
+                                set_margin_all: 10,
+                                set_align: gtk::Align::Center,
+                                add_css_class: "card",
+                                add_css_class: "weather-card",
+                                #[watch]
+                                add_css_class?: model.current_weather.as_ref().map(|current| current.weathercode.get_background_css_class(current.is_day)),
 
                                 gtk::Image {
                                     #[watch]
@@ -157,6 +162,8 @@ impl Component for App {
                                 },
                                 gtk::Box {
                                     set_orientation: gtk::Orientation::Vertical,
+                                    set_margin_top: 10,
+                                    set_margin_end: 10,
                                     set_spacing: 10,
                                     #[local_ref]
                                     city_picker_button-> gtk::Button {
