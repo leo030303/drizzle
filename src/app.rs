@@ -157,6 +157,7 @@ impl Component for App {
                                     set_spacing: 10,
                                     #[local_ref]
                                     city_picker_button-> gtk::Button {
+                                        set_align: gtk::Align::Center,
                                         connect_clicked[sender] => move |_| {
                                             sender.input(AppMsg::ShowCityPicker);
                                         },
@@ -165,12 +166,14 @@ impl Component for App {
                                             gtk::Image {
                                                 set_icon_name: Some("mark-location-symbolic"),
                                                 set_icon_size: gtk::IconSize::Normal,
-                                                set_margin_horizontal: 10,
+                                                set_margin_start: 5,
+                                                set_margin_end: 10,
                                             },
                                             gtk::Label {
                                                 #[watch]
                                                 set_label: &model.current_city.as_ref().map(|geo| geo.name.clone()).unwrap_or(String::from("Select A City")),
-                                            },
+                                                set_margin_end: 5,
+                                                },
 
                                         },
                                     },
