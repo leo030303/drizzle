@@ -21,9 +21,11 @@ impl FactoryComponent for HourEntryWidget {
     view! {
         gtk::Box{
             set_orientation: gtk::Orientation::Vertical,
-            add_css_class: "card",
-            add_css_class: "weather-card",
-            add_css_class: self.forecast_data.weathercode.get_background_css_class(self.forecast_data.is_day),
+            set_css_classes: &[
+                "card",
+                "weather-card",
+                self.forecast_data.weathercode.get_background_css_class(self.forecast_data.is_day)
+            ],
             set_spacing: 5,
             gtk::Box{
                 set_orientation: gtk::Orientation::Horizontal,
@@ -37,12 +39,12 @@ impl FactoryComponent for HourEntryWidget {
                     set_icon_size: gtk::IconSize::Large,
                 },
                 gtk::Label {
-                    add_css_class: "title-2",
+                    set_css_classes: &["title-2"],
                     set_label: &chrono::DateTime::from_timestamp_secs(self.forecast_data.time).unwrap().format("%H:%M").to_string(),
                 },
             },
             gtk::Label {
-                add_css_class: "title-4",
+                set_css_classes: &["title-4"],
                 set_label: &format!("{}℃", self.forecast_data.temperature_2m),
                 set_margin_horizontal: 5,
             },

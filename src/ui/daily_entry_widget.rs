@@ -20,9 +20,11 @@ impl FactoryComponent for DayEntryWidget {
     view! {
         gtk::Box{
             set_orientation: gtk::Orientation::Vertical,
-            add_css_class: "card",
-            add_css_class: "weather-card",
-            add_css_class: self.forecast_data.weathercode.get_background_css_class(true),
+            set_css_classes: &[
+                "card",
+                "weather-card",
+                self.forecast_data.weathercode.get_background_css_class(true)
+            ],
             set_spacing: 5,
             gtk::Box{
                 set_orientation: gtk::Orientation::Horizontal,
@@ -34,7 +36,7 @@ impl FactoryComponent for DayEntryWidget {
                     set_icon_size: gtk::IconSize::Large,
                 },
                 gtk::Label {
-                    add_css_class: "title-2",
+                    set_css_classes: &["title-2"],
                     set_label: &chrono::DateTime::from_timestamp_secs(self.forecast_data.time).unwrap().format("%a %d/%m").to_string(),
                 },
             },

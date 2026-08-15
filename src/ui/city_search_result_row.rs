@@ -39,7 +39,7 @@ impl FactoryComponent for CitySearchResultRow {
                     set_halign: gtk::Align::Start,
                     #[watch]
                     set_label: &self.city.name,
-                    add_css_class: "heading",
+                    set_css_classes: &["heading"],
                 },
 
                 gtk::Label {

@@ -115,8 +115,7 @@ impl Component for App {
                         #[local_ref]
                         none_selected_city_picker_button -> gtk::Button {
                             set_label: "Search",
-                            add_css_class: "pill",
-                            add_css_class: "suggested-action",
+                            set_css_classes: &["pill", "suggested-action"],
                             set_halign: gtk::Align::Center,
                             connect_clicked => AppMsg::ShowCityPicker,
                         }
@@ -145,13 +144,15 @@ impl Component for App {
                         gtk::Box {
                             set_orientation: gtk::Orientation::Vertical,
                             gtk::Box {
+                                #[watch]
+                                set_css_classes: &[
+                                    "card",
+                                    "weather-card",
+                                    model.current_weather.as_ref().map(|current| current.weathercode.get_background_css_class(current.is_day)).unwrap_or("")
+                                ],
                                 set_orientation: gtk::Orientation::Horizontal,
                                 set_margin_all: 10,
                                 set_align: gtk::Align::Center,
-                                add_css_class: "card",
-                                add_css_class: "weather-card",
-                                #[watch]
-                                add_css_class?: model.current_weather.as_ref().map(|current| current.weathercode.get_background_css_class(current.is_day)),
 
                                 gtk::Image {
                                     #[watch]
@@ -190,12 +191,12 @@ impl Component for App {
                                     gtk::Label {
                                         #[watch]
                                         set_label: &format!("{}℃", model.current_weather.as_ref().map(|current| current.temperature_2m.to_string()).unwrap_or_default()),
-                                        add_css_class: "current-temp-label",
+                                        set_css_classes: &["current-temp-label"],
                                     },
                                     gtk::Label {
                                         #[watch]
                                         set_label: &format!("Feels like {}℃", model.current_weather.as_ref().map(|current| current.apparent_temperature.to_string()).unwrap_or_default()),
-                                        add_css_class: "current-apparent-temp-label",
+                                        set_css_classes: &["current-apparent-temp-label"],
                                         set_margin_bottom: 10,
                                         set_margin_start: 30,
                                     },
@@ -204,7 +205,7 @@ impl Component for App {
 
                             gtk::Label {
                                 set_label: "Hourly",
-                                add_css_class: "title-1",
+                                set_css_classes: &["title-1"],
                             },
 
                             #[local_ref]
@@ -222,7 +223,7 @@ impl Component for App {
 
                             gtk::Label {
                                 set_label: "Daily",
-                                add_css_class: "title-1",
+                                set_css_classes: &["title-1"],
                             },
 
                             #[local_ref]

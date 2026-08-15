@@ -70,7 +70,7 @@ impl Component for CityPickerDialog {
                     #[local_ref]
                     cities_list_widget -> gtk::ListBox {
                         set_selection_mode: gtk::SelectionMode::None,
-                        add_css_class: "boxed-list",
+                        set_css_classes: &["boxed-list"],
                         set_margin_top: 10,
                     }
                 },
