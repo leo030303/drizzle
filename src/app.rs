@@ -147,7 +147,7 @@ impl Component for App {
 
                                 gtk::Image {
                                     #[watch]
-                                    set_icon_name: model.current_weather.as_ref().map(|current| current.weathercode.get_icon_name(current.is_day)),
+                                    set_resource: model.current_weather.as_ref().map(|current| current.weathercode.get_status_image_resource(current.is_day)),
                                     set_icon_size: gtk::IconSize::Inherit,
                                     set_pixel_size: 84,
                                     set_margin_all: 20,

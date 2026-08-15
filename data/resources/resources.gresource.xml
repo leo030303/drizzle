@@ -4,5 +4,15 @@
     <!-- see https://gtk-rs.org/gtk4-rs/git/docs/gtk4/struct.Application.html#automatic-resources -->
     <file compressed="true" preprocess="xml-stripblanks" alias="gtk/help-overlay.ui">ui/shortcuts.ui</file>
     <file compressed="true">style.css</file>
+    <file compressed="true">weather_status_icons/drizzle-storm.svg</file>
+    <file compressed="true">weather_status_icons/drizzle-showers.svg</file>
+    <file compressed="true">weather_status_icons/drizzle-snow.svg</file>
+    <file compressed="true">weather_status_icons/drizzle-clear.svg</file>
+    <file compressed="true">weather_status_icons/drizzle-overcast.svg</file>
+    <file compressed="true">weather_status_icons/drizzle-few-clouds.svg</file>
+    <file compressed="true">weather_status_icons/drizzle-clear-night.svg</file>
+    <file compressed="true">weather_status_icons/drizzle-showers-scattered.svg</file>
+    <file compressed="true">weather_status_icons/drizzle-few-clouds-night.svg</file>
+    <file compressed="true">weather_status_icons/drizzle-fog.svg</file>
   </gresource>
 </gresources>

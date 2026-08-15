@@ -79,6 +79,63 @@ impl WeatherCode {
             WeatherCode::NoMatch => "",
         }
     }
+
+    pub fn get_status_image_resource(&self, is_day: bool) -> &'static str {
+        match self {
+            WeatherCode::ClearSky | WeatherCode::MainlyClear => {
+                if is_day {
+                    "/com/github/leo030303/drizzle/weather_status_icons/drizzle-clear.svg"
+                } else {
+                    "/com/github/leo030303/drizzle/weather_status_icons/drizzle-clear-night.svg"
+                }
+            }
+            WeatherCode::PartlyCloudy => {
+                if is_day {
+                    "/com/github/leo030303/drizzle/weather_status_icons/drizzle-few-clouds.svg"
+                } else {
+                    "/com/github/leo030303/drizzle/weather_status_icons/drizzle-few-clouds-night.svg"
+                }
+            }
+            WeatherCode::Overcast => {
+                "/com/github/leo030303/drizzle/weather_status_icons/drizzle-overcast.svg"
+            }
+            WeatherCode::Fog | WeatherCode::DepositingRimeFog => {
+                "/com/github/leo030303/drizzle/weather_status_icons/drizzle-fog.svg"
+            }
+            WeatherCode::LightRainShowers
+            | WeatherCode::LightDrizzle
+            | WeatherCode::ModerateDrizzle
+            | WeatherCode::LightFreezingDrizzle
+            | WeatherCode::LightRain
+            | WeatherCode::LightFreezingRain => {
+                "/com/github/leo030303/drizzle/weather_status_icons/drizzle-showers.svg"
+            }
+            WeatherCode::ModerateRain
+            | WeatherCode::HeavyRain
+            | WeatherCode::DenseFreezingDrizzle
+            | WeatherCode::DenseDrizzle
+            | WeatherCode::ModerateRainShowers
+            | WeatherCode::ViolentRainShowers
+            | WeatherCode::HeavyFreezingRain => {
+                "/com/github/leo030303/drizzle/weather_status_icons/drizzle-showers-scattered.svg"
+            }
+            WeatherCode::LightSnowShowers
+            | WeatherCode::HeavySnowShowers
+            | WeatherCode::LightSnowFall
+            | WeatherCode::ModerateSnowFall
+            | WeatherCode::HeavySnowFall
+            | WeatherCode::SnowGrains => {
+                "/com/github/leo030303/drizzle/weather_status_icons/drizzle-snow.svg"
+            }
+            WeatherCode::Thunderstorm
+            | WeatherCode::ThunderstormLightHail
+            | WeatherCode::ThunderstormHeavyHail => {
+                "/com/github/leo030303/drizzle/weather_status_icons/drizzle-storm.svg"
+            }
+            WeatherCode::NoMatch => "",
+        }
+    }
+
     pub fn get_background_css_class(&self, is_day: bool) -> &'static str {
         match self {
             WeatherCode::ClearSky | WeatherCode::MainlyClear => {
