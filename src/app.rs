@@ -136,91 +136,95 @@ impl Component for App {
                         }
                     },
 
-                    gtk::Box {
-                        set_orientation: gtk::Orientation::Horizontal,
-                        set_margin_top: 10,
-
-                        gtk::Image {
-                            #[watch]
-                            set_icon_name: model.current_weather.as_ref().map(|current| current.weathercode.get_icon_name(current.is_day)),
-                            set_icon_size: gtk::IconSize::Inherit,
-                            set_pixel_size: 84,
-                            set_margin_all: 20,
-                        },
+                    gtk::ScrolledWindow {
+                        set_vexpand: true,
+                        set_policy: (gtk::PolicyType::Never, gtk::PolicyType::Automatic),
                         gtk::Box {
                             set_orientation: gtk::Orientation::Vertical,
-                            set_spacing: 10,
-                            #[local_ref]
-                            city_picker_button-> gtk::Button {
-                                connect_clicked[sender] => move |_| {
-                                    sender.input(AppMsg::ShowCityPicker);
+                            gtk::Box {
+                                set_orientation: gtk::Orientation::Horizontal,
+                                set_margin_top: 10,
+
+                                gtk::Image {
+                                    #[watch]
+                                    set_icon_name: model.current_weather.as_ref().map(|current| current.weathercode.get_icon_name(current.is_day)),
+                                    set_icon_size: gtk::IconSize::Inherit,
+                                    set_pixel_size: 84,
+                                    set_margin_all: 20,
                                 },
                                 gtk::Box {
-                                    set_orientation: gtk::Orientation::Horizontal,
-                                    gtk::Image {
-                                        set_icon_name: Some("mark-location-symbolic"),
-                                        set_icon_size: gtk::IconSize::Normal,
-                                        set_margin_horizontal: 10,
+                                    set_orientation: gtk::Orientation::Vertical,
+                                    set_spacing: 10,
+                                    #[local_ref]
+                                    city_picker_button-> gtk::Button {
+                                        connect_clicked[sender] => move |_| {
+                                            sender.input(AppMsg::ShowCityPicker);
+                                        },
+                                        gtk::Box {
+                                            set_orientation: gtk::Orientation::Horizontal,
+                                            gtk::Image {
+                                                set_icon_name: Some("mark-location-symbolic"),
+                                                set_icon_size: gtk::IconSize::Normal,
+                                                set_margin_horizontal: 10,
+                                            },
+                                            gtk::Label {
+                                                #[watch]
+                                                set_label: &model.current_city.as_ref().map(|geo| geo.name.clone()).unwrap_or(String::from("Select A City")),
+                                            },
+
+                                        },
                                     },
                                     gtk::Label {
                                         #[watch]
-                                        set_label: &model.current_city.as_ref().map(|geo| geo.name.clone()).unwrap_or(String::from("Select A City")),
+                                        set_label: &format!("{}℃", model.current_weather.as_ref().map(|current| current.temperature_2m.to_string()).unwrap_or_default()),
+                                        add_css_class: "current-temp-label",
                                     },
-
+                                    gtk::Label {
+                                        #[watch]
+                                        set_label: &format!("Feels like {}℃", model.current_weather.as_ref().map(|current| current.apparent_temperature.to_string()).unwrap_or_default()),
+                                        add_css_class: "current-apparent-temp-label",
+                                        set_margin_bottom: 10,
+                                        set_margin_start: 30,
+                                    },
                                 },
                             },
+
                             gtk::Label {
-                                #[watch]
-                                set_label: &format!("{}℃", model.current_weather.as_ref().map(|current| current.temperature_2m.to_string()).unwrap_or_default()),
-                                add_css_class: "current-temp-label",
+                                set_label: "Hourly",
+                                add_css_class: "title-1",
                             },
+
+                            gtk::ScrolledWindow {
+                                set_hexpand: true,
+                                set_policy: (gtk::PolicyType::Automatic, gtk::PolicyType::Never),
+
+                                #[local_ref]
+                                hourly_box -> gtk::Box {
+                                    set_orientation: gtk::Orientation::Horizontal,
+                                    set_spacing: 5,
+                                    set_margin_all: 10,
+                                }
+                            },
+
                             gtk::Label {
-                                #[watch]
-                                set_label: &format!("Feels like {}℃", model.current_weather.as_ref().map(|current| current.apparent_temperature.to_string()).unwrap_or_default()),
-                                add_css_class: "current-apparent-temp-label",
-                                set_margin_bottom: 10,
-                                set_margin_start: 30,
+                                set_label: "Daily",
+                                add_css_class: "title-1",
                             },
-                        },
-                    },
 
-                    gtk::Label {
-                        set_label: "Hourly",
-                        add_css_class: "title-1",
-                    },
+                            gtk::ScrolledWindow {
+                                set_hexpand: true,
+                                set_policy: (gtk::PolicyType::Automatic, gtk::PolicyType::Never),
 
-                    gtk::ScrolledWindow {
-                        set_hexpand: true,
-                        set_propagate_natural_width: false,
-                        set_policy: (gtk::PolicyType::Automatic, gtk::PolicyType::Never),
-
-                        #[local_ref]
-                        hourly_box -> gtk::Box {
-                            set_orientation: gtk::Orientation::Horizontal,
-                            set_spacing: 5,
-                            set_margin_all: 10,
+                                #[local_ref]
+                                daily_box -> gtk::Box {
+                                    set_orientation: gtk::Orientation::Horizontal,
+                                    set_spacing: 5,
+                                    set_margin_all: 10,
+                                }
+                            },
                         }
-                    },
-
-                    gtk::Label {
-                        set_label: "Daily",
-                        add_css_class: "title-1",
-                    },
-
-                    gtk::ScrolledWindow {
-                        set_hexpand: true,
-                        set_propagate_natural_width: false,
-                        set_policy: (gtk::PolicyType::Automatic, gtk::PolicyType::Never),
-
-                        #[local_ref]
-                        daily_box -> gtk::Box {
-                            set_orientation: gtk::Orientation::Horizontal,
-                            set_spacing: 5,
-                            set_margin_all: 10,
-                        }
-                    },
+                    }
                 }
-
             }
 
 
