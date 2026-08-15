@@ -16,6 +16,7 @@ use relm4::ComponentController;
 use relm4::Controller;
 use relm4::adw::prelude::AdwDialogExt;
 use relm4::gtk::gio::prelude::SettingsExtManual;
+use relm4::gtk::prelude::AdjustmentExt;
 use relm4::{
     Component, ComponentParts, ComponentSender, RelmWidgetExt,
     actions::{AccelsPlus, RelmAction, RelmActionGroup},
@@ -40,6 +41,8 @@ pub struct App {
     current_city: Option<GeoResponse>,
     city_search_dialog: Controller<CityPickerDialog>,
     recent_cities: Vec<GeoResponse>,
+    hourly_scrolled_window: gtk::ScrolledWindow,
+    daily_scrolled_window: gtk::ScrolledWindow,
 }
 
 #[derive(Debug)]
@@ -197,7 +200,8 @@ impl Component for App {
                                 add_css_class: "title-1",
                             },
 
-                            gtk::ScrolledWindow {
+                            #[local_ref]
+                            hourly_scrolled_window -> gtk::ScrolledWindow {
                                 set_hexpand: true,
                                 set_policy: (gtk::PolicyType::Automatic, gtk::PolicyType::Never),
 
@@ -214,7 +218,8 @@ impl Component for App {
                                 add_css_class: "title-1",
                             },
 
-                            gtk::ScrolledWindow {
+                            #[local_ref]
+                            daily_scrolled_window -> gtk::ScrolledWindow {
                                 set_hexpand: true,
                                 set_policy: (gtk::PolicyType::Automatic, gtk::PolicyType::Never),
 
@@ -255,11 +260,15 @@ impl Component for App {
                 .launch(())
                 .forward(sender.input_sender(), |response| response),
             recent_cities: vec![],
+            hourly_scrolled_window: gtk::ScrolledWindow::new(),
+            daily_scrolled_window: gtk::ScrolledWindow::new(),
         };
         let hourly_box = model.hourly_entries.widget();
         let daily_box = model.daily_entries.widget();
         let city_picker_button = gtk::Button::new();
         let none_selected_city_picker_button = gtk::Button::new();
+        let hourly_scrolled_window = model.hourly_scrolled_window.clone();
+        let daily_scrolled_window = model.daily_scrolled_window.clone();
         let widgets = view_output!();
 
         let app = root.application().unwrap();
@@ -343,6 +352,12 @@ impl Component for App {
             }
             AppMsg::SelectCity(selected_city) => {
                 self.current_city = Some(selected_city.clone());
+                self.hourly_scrolled_window
+                    .hadjustment()
+                    .set_value(self.hourly_scrolled_window.hadjustment().lower());
+                self.daily_scrolled_window
+                    .hadjustment()
+                    .set_value(self.daily_scrolled_window.hadjustment().lower());
                 if !self.recent_cities.contains(&selected_city) {
                     self.recent_cities.insert(0, selected_city);
                 }
