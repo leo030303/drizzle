@@ -4,6 +4,7 @@ mod app;
 mod modals;
 mod ui;
 mod weather_api;
+mod weather_rec;
 
 use config::{APP_ID, GETTEXT_PACKAGE, LOCALEDIR, RESOURCES_FILE};
 use gettextrs::{LocaleCategory, gettext};

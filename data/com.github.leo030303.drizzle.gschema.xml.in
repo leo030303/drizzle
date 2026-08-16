@@ -17,5 +17,9 @@
       <default>[]</default>
       <summary>JSON objects of GeoResponses for recent cities</summary>
     </key>
+    <key name="recommendation-timespan" type="s">
+      <default>"FourHour"</default>
+      <summary>The timespan to display recommendations for</summary>
+    </key>
   </schema>
 </schemalist>

@@ -63,6 +63,7 @@ pub struct DailyWeatherRaw {
 pub struct HourlyWeatherRaw {
     pub time: Vec<i64>,
     pub temperature_2m: Vec<f64>,
+    pub apparent_temperature: Vec<f64>,
     pub weathercode: Vec<i64>,
     pub precipitation: Vec<f64>,
     pub precipitation_probability: Vec<f64>,
@@ -75,6 +76,7 @@ pub struct HourlyWeatherRaw {
 pub struct HourlyEntry {
     pub time: i64,
     pub temperature_2m: f64,
+    pub apparent_temperature: f64,
     pub weathercode: WeatherCode,
     pub precipitation: f64,
     pub precipitation_probability: f64,
@@ -105,6 +107,7 @@ impl HourlyWeatherRaw {
             .map(|(i, &time)| HourlyEntry {
                 time: time + utc_offset,
                 temperature_2m: self.temperature_2m[i],
+                apparent_temperature: self.apparent_temperature[i],
                 weathercode: WeatherCode::from(self.weathercode[i]),
                 precipitation: self.precipitation[i],
                 precipitation_probability: self.precipitation_probability[i],
@@ -169,8 +172,9 @@ pub async fn get_weather_hourly(
     city_details: &GeoResponse,
     is_metric: bool,
 ) -> Result<Vec<HourlyEntry>, Box<dyn std::error::Error>> {
-    const HOURLY_METRICS_LIST: [&str; 7] = [
+    const HOURLY_METRICS_LIST: [&str; 8] = [
         "temperature_2m",
+        "apparent_temperature",
         "weathercode",
         "precipitation",
         "precipitation_probability",

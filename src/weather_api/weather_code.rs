@@ -2,7 +2,7 @@ use serde::Deserialize;
 
 /// WMO Weather interpretation codes (WW)
 /// See https://open-meteo.com/en/docs#weather_variable_documentation
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize, Clone, PartialEq)]
 pub enum WeatherCode {
     ClearSky,
     MainlyClear,
@@ -214,6 +214,51 @@ impl WeatherCode {
             }
             WeatherCode::NoMatch => "",
         }
+    }
+
+    pub fn is_rain(&self) -> bool {
+        [
+            WeatherCode::LightDrizzle,
+            WeatherCode::ModerateDrizzle,
+            WeatherCode::DenseDrizzle,
+            WeatherCode::LightFreezingDrizzle,
+            WeatherCode::DenseFreezingDrizzle,
+            WeatherCode::LightRain,
+            WeatherCode::ModerateRain,
+            WeatherCode::HeavyRain,
+            WeatherCode::LightFreezingRain,
+            WeatherCode::HeavyFreezingRain,
+            WeatherCode::LightRainShowers,
+            WeatherCode::ModerateRainShowers,
+            WeatherCode::ViolentRainShowers,
+            WeatherCode::Thunderstorm,
+        ]
+        .contains(self)
+    }
+
+    pub fn is_snow(&self) -> bool {
+        [
+            WeatherCode::LightSnowFall,
+            WeatherCode::ModerateSnowFall,
+            WeatherCode::HeavySnowFall,
+            WeatherCode::LightSnowShowers,
+            WeatherCode::HeavySnowShowers,
+            WeatherCode::SnowGrains,
+        ]
+        .contains(self)
+    }
+
+    pub fn is_fog(&self) -> bool {
+        [WeatherCode::Fog, WeatherCode::DepositingRimeFog].contains(self)
+    }
+
+    pub fn is_storm(&self) -> bool {
+        [
+            WeatherCode::Thunderstorm,
+            WeatherCode::ThunderstormLightHail,
+            WeatherCode::ThunderstormHeavyHail,
+        ]
+        .contains(self)
     }
 }
 

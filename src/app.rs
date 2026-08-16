@@ -5,6 +5,7 @@ use crate::modals::city_picker::CityPickerDialogMsg;
 use crate::modals::shortcuts::ShortcutsDialog;
 use crate::ui::daily_entry_widget::DayEntryWidget;
 use crate::ui::hour_entry_widget::HourEntryWidget;
+use crate::ui::weather_recommendation_widget::WeatherRecommendationWidget;
 use crate::weather_api::find_city::GeoResponse;
 use crate::weather_api::weather::CurrentWeather;
 use crate::weather_api::weather::DailyEntry;
@@ -12,6 +13,8 @@ use crate::weather_api::weather::HourlyEntry;
 use crate::weather_api::weather::get_weather_current;
 use crate::weather_api::weather::get_weather_daily;
 use crate::weather_api::weather::get_weather_hourly;
+use crate::weather_rec::RecommendationTimespan;
+use crate::weather_rec::get_recommendations;
 use relm4::ComponentController;
 use relm4::Controller;
 use relm4::adw::prelude::AdwDialogExt;
@@ -37,6 +40,8 @@ pub struct App {
     is_loading: bool,
     hourly_entries: FactoryVecDeque<HourEntryWidget>,
     daily_entries: FactoryVecDeque<DayEntryWidget>,
+    weather_recommendations: FactoryVecDeque<WeatherRecommendationWidget>,
+    recommendation_timespan_toggle: adw::ToggleGroup,
     current_weather: Option<CurrentWeather>,
     current_city: Option<GeoResponse>,
     city_search_dialog: Controller<CityPickerDialog>,
@@ -50,6 +55,7 @@ pub enum AppMsg {
     ShowCityPicker,
     SelectCity(GeoResponse),
     RefreshWeatherData,
+    RefreshWeatherRecommendations,
     SetWeatherData(Vec<HourlyEntry>, Vec<DailyEntry>, CurrentWeather),
     Quit,
 }
@@ -150,57 +156,89 @@ impl Component for App {
                                     "weather-card",
                                     model.current_weather.as_ref().map(|current| current.weathercode.get_background_css_class(current.is_day)).unwrap_or("")
                                 ],
-                                set_orientation: gtk::Orientation::Horizontal,
+                                set_orientation: gtk::Orientation::Vertical,
                                 set_margin_all: 10,
                                 set_align: gtk::Align::Center,
 
-                                gtk::Image {
-                                    #[watch]
-                                    set_resource: model.current_weather.as_ref().map(|current| current.weathercode.get_status_image_resource(current.is_day)),
-                                    set_icon_size: gtk::IconSize::Inherit,
-                                    set_pixel_size: 84,
-                                    set_margin_all: 20,
-                                },
                                 gtk::Box {
-                                    set_orientation: gtk::Orientation::Vertical,
-                                    set_margin_top: 10,
-                                    set_margin_end: 10,
-                                    set_spacing: 10,
-                                    #[local_ref]
-                                    city_picker_button-> gtk::Button {
-                                        set_align: gtk::Align::Center,
-                                        connect_clicked[sender] => move |_| {
-                                            sender.input(AppMsg::ShowCityPicker);
-                                        },
-                                        gtk::Box {
-                                            set_orientation: gtk::Orientation::Horizontal,
-                                            gtk::Image {
-                                                set_icon_name: Some("mark-location-symbolic"),
-                                                set_icon_size: gtk::IconSize::Normal,
-                                                set_margin_start: 5,
-                                                set_margin_end: 10,
+                                    set_orientation: gtk::Orientation::Horizontal,
+                                    gtk::Image {
+                                        #[watch]
+                                        set_resource: model.current_weather.as_ref().map(|current| current.weathercode.get_status_image_resource(current.is_day)),
+                                        set_icon_size: gtk::IconSize::Inherit,
+                                        set_pixel_size: 84,
+                                        set_margin_all: 20,
+                                    },
+                                    gtk::Box {
+                                        set_orientation: gtk::Orientation::Vertical,
+                                        set_margin_top: 10,
+                                        set_margin_end: 10,
+                                        set_spacing: 10,
+                                        #[local_ref]
+                                        city_picker_button-> gtk::Button {
+                                            set_align: gtk::Align::Center,
+                                            connect_clicked[sender] => move |_| {
+                                                sender.input(AppMsg::ShowCityPicker);
                                             },
-                                            gtk::Label {
-                                                #[watch]
-                                                set_label: &model.current_city.as_ref().map(|geo| geo.name.clone()).unwrap_or(String::from("Select A City")),
-                                                set_margin_end: 5,
+                                            gtk::Box {
+                                                set_orientation: gtk::Orientation::Horizontal,
+                                                gtk::Image {
+                                                    set_icon_name: Some("mark-location-symbolic"),
+                                                    set_icon_size: gtk::IconSize::Normal,
+                                                    set_margin_start: 5,
+                                                    set_margin_end: 10,
                                                 },
+                                                gtk::Label {
+                                                    #[watch]
+                                                    set_label: &model.current_city.as_ref().map(|geo| geo.name.clone()).unwrap_or(String::from("Select A City")),
+                                                    set_margin_end: 5,
+                                                    },
 
+                                            },
                                         },
-                                    },
-                                    gtk::Label {
-                                        #[watch]
-                                        set_label: &format!("{}℃", model.current_weather.as_ref().map(|current| current.temperature_2m.to_string()).unwrap_or_default()),
-                                        set_css_classes: &["current-temp-label"],
-                                    },
-                                    gtk::Label {
-                                        #[watch]
-                                        set_label: &format!("Feels like {}℃", model.current_weather.as_ref().map(|current| current.apparent_temperature.to_string()).unwrap_or_default()),
-                                        set_css_classes: &["current-apparent-temp-label"],
-                                        set_margin_bottom: 10,
-                                        set_margin_start: 30,
+                                        gtk::Label {
+                                            #[watch]
+                                            set_label: &format!("{}℃", model.current_weather.as_ref().map(|current| current.temperature_2m.to_string()).unwrap_or_default()),
+                                            set_css_classes: &["current-temp-label"],
+                                        },
+                                        gtk::Label {
+                                            #[watch]
+                                            set_label: &format!("Feels like {}℃", model.current_weather.as_ref().map(|current| current.apparent_temperature.to_string()).unwrap_or_default()),
+                                            set_css_classes: &["current-apparent-temp-label"],
+                                            set_margin_bottom: 10,
+                                            set_margin_start: 30,
+                                        },
                                     },
                                 },
+                                #[local_ref]
+                                timespan_togglegroup -> adw::ToggleGroup {
+                                    set_margin_horizontal: 5,
+                                    connect_active_name_notify[sender] => move |_| {
+                                        sender.input(AppMsg::RefreshWeatherRecommendations);
+                                    },
+                                    add = adw::Toggle {
+                                        set_label: Some("4 Hour"),
+                                        set_name: Some(RecommendationTimespan::FourHour.to_name())
+                                    },
+                                    add = adw::Toggle {
+                                        set_label: Some("8 Hour"),
+                                        set_name: Some(RecommendationTimespan::EightHour.to_name())
+                                    },
+                                    add = adw::Toggle {
+                                        set_label: Some("12 Hour"),
+                                        set_name: Some(RecommendationTimespan::TwelveHour.to_name())
+                                    },
+                                    add = adw::Toggle {
+                                        set_label: Some("24 Hour"),
+                                        set_name: Some(RecommendationTimespan::TwentyFourHour.to_name())
+                                    },
+                                },
+                                #[local_ref]
+                                weather_recommendations_box -> gtk::Box {
+                                    set_orientation: gtk::Orientation::Vertical,
+                                    set_margin_all: 10,
+                                    set_spacing: 5,
+                                }
                             },
 
                             gtk::Label {
@@ -258,6 +296,10 @@ impl Component for App {
         let daily_entries: FactoryVecDeque<DayEntryWidget> = FactoryVecDeque::builder()
             .launch(gtk::Box::default())
             .forward(sender.input_sender(), |output| output);
+        let weather_recommendations: FactoryVecDeque<WeatherRecommendationWidget> =
+            FactoryVecDeque::builder()
+                .launch(gtk::Box::default())
+                .detach();
         let mut model = Self {
             is_loading: false,
             hourly_entries,
@@ -270,13 +312,21 @@ impl Component for App {
             recent_cities: vec![],
             hourly_scrolled_window: gtk::ScrolledWindow::new(),
             daily_scrolled_window: gtk::ScrolledWindow::new(),
+            recommendation_timespan_toggle: adw::ToggleGroup::new(),
+            weather_recommendations,
         };
         let hourly_box = model.hourly_entries.widget();
         let daily_box = model.daily_entries.widget();
+        let weather_recommendations_box = model.weather_recommendations.widget();
         let city_picker_button = gtk::Button::new();
         let none_selected_city_picker_button = gtk::Button::new();
         let hourly_scrolled_window = model.hourly_scrolled_window.clone();
         let daily_scrolled_window = model.daily_scrolled_window.clone();
+        let timespan_togglegroup = model.recommendation_timespan_toggle.clone();
+
+        model
+            .recommendation_timespan_toggle
+            .set_active_name(Some(RecommendationTimespan::FourHour.to_name()));
         let widgets = view_output!();
 
         let app = root.application().unwrap();
@@ -339,6 +389,22 @@ impl Component for App {
                 }
             }
             AppMsg::Quit => main_application().quit(),
+            AppMsg::RefreshWeatherRecommendations => {
+                self.weather_recommendations.guard().clear();
+                let hour_entries: Vec<HourlyEntry> = self
+                    .hourly_entries
+                    .iter()
+                    .map(|item| item.forecast_data.clone())
+                    .collect();
+                for rec in get_recommendations(
+                    &hour_entries,
+                    &RecommendationTimespan::from_name(
+                        &self.recommendation_timespan_toggle.active_name().unwrap(),
+                    ),
+                ) {
+                    self.weather_recommendations.guard().push_back(rec);
+                }
+            }
             AppMsg::SetWeatherData(hour_entries, day_entries, current_weather) => {
                 self.hourly_entries.guard().clear();
                 for entry in hour_entries {
@@ -350,6 +416,7 @@ impl Component for App {
                 }
                 self.current_weather = Some(current_weather);
                 self.is_loading = false;
+                sender.input(AppMsg::RefreshWeatherRecommendations);
             }
             AppMsg::ShowCityPicker => {
                 self.city_search_dialog
@@ -366,9 +433,17 @@ impl Component for App {
                 self.daily_scrolled_window
                     .hadjustment()
                     .set_value(self.daily_scrolled_window.hadjustment().lower());
-                if !self.recent_cities.contains(&selected_city) {
-                    self.recent_cities.insert(0, selected_city);
+                if self.recent_cities.contains(&selected_city) {
+                    let target_index = self
+                        .recent_cities
+                        .iter()
+                        .enumerate()
+                        .find(|(_i, item)| **item == selected_city)
+                        .unwrap()
+                        .0;
+                    self.recent_cities.remove(target_index);
                 }
+                self.recent_cities.insert(0, selected_city);
                 if self.recent_cities.len() > 5 {
                     self.recent_cities.pop();
                 }
@@ -400,6 +475,10 @@ impl AppWidgets {
         settings.set_int("window-height", height)?;
 
         settings.set_boolean("is-maximized", self.main_window.is_maximized())?;
+        settings.set_string(
+            "recommendation-timespan",
+            &model.recommendation_timespan_toggle.active_name().unwrap(),
+        )?;
         settings.set_strv(
             "recent-cities",
             model
@@ -424,6 +503,9 @@ impl AppWidgets {
             .collect();
         model.recent_cities = recent_cities;
         model.current_city = model.recent_cities.first().cloned();
+        model
+            .recommendation_timespan_toggle
+            .set_active_name(Some(&settings.string("recommendation-timespan")));
 
         let width = settings.int("window-width");
         let height = settings.int("window-height");
