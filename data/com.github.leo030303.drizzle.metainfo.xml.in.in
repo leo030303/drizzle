@@ -1,33 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Leo Ring 2019 <leoring03@gmail.com> -->
+<!-- Leo Ring 2026 <leoring03@gmail.com> -->
 <component type="desktop-application">
   <id>@app-id@</id>
   <metadata_license>CC0</metadata_license>
-  <!-- Insert your license of choice here -->
-  <!-- <project_license>MIT</project_license> -->
+  <project_license> GNU GPLv3 </project_license>
   <name>Drizzle</name>
-  <summary>Write a GTK + Rust application</summary>
+  <summary>Foolproof weather forecasts</summary>
   <description>
-    <p>A boilerplate template for GTK + Rust. It uses Meson as a build system and has flatpak support by default.</p>
+    <p>An adaptive, colourful weather app for Gnome.</p>
   </description>
   <screenshots>
     <screenshot type="default">
-      <image>https://gitlab.gnome.org/bilelmoussaoui/drizzle/raw/master/data/resources/screenshots/screenshot1.png</image>
-      <caption>Main window</caption>
+      <image>https://github.com/leo030303/drizzle/blob/main/data/resources/screenshots/Screenshot_main_dark.png?raw=true</image>
+      <caption>Main window (Dark)</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://github.com/leo030303/drizzle/blob/main/data/resources/screenshots/Screenshot_main_light.png?raw=true</image>
+      <caption>Main window (Light)</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://github.com/leo030303/drizzle/blob/main/data/resources/screenshots/Screenshot_mobile_main.png?raw=true</image>
+      <caption>Adaptive UI</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://github.com/leo030303/drizzle/blob/main/data/resources/screenshots/Screenshot_mobile_search.png?raw=true</image>
+      <caption>Search for your city</caption>
     </screenshot>
   </screenshots>
-  <url type="homepage">https://gitlab.gnome.org/bilelmoussaoui/drizzle</url>
-  <url type="bugtracker">https://gitlab.gnome.org/bilelmoussaoui/drizzle/issues</url>
-  <!-- Source code repository -->
-  <url type="vcs-browser">https://gitlab.gnome.org/bilelmoussaoui/drizzle</url>
+  <url type="homepage">https://github.com/leo030303/drizzle</url>
+  <url type="bugtracker">https://github.com/leo030303/drizzle/issues</url>
+  <url type="vcs-browser">https://github.com/leo030303/drizzle</url>
   <!-- Translation repository -->
-  <url type="translate">https://gitlab.gnome.org/bilelmoussaoui/drizzle/-/tree/master/po</url>
+  <url type="translate">https://github.com/leo030303/drizzle/tree/main/po</url>
   <!-- Open Age Ratings Service:
        https://hughsie.github.io/oars/generate.html
   -->
   <content_rating type="oars-1.1" />
-  <releases>
-    <release version="0.1.0" date="2019-07-11" />
+  <releases>https://github.com/leo030303/drizzle/tree/main/po
+    <release version="0.1.0" date="2026-08-21" />
   </releases>
   <kudos>
      <!--
@@ -40,9 +50,18 @@
   <!-- developer_name tag deprecated with Appstream 1.0 -->
   <developer_name translate="no">Leo Ring</developer_name>
   <!-- Introduced with Appstream 1.0, but not yet fully supported by corresponding projects -->
-  <developer id="gnome.org">
+  <developer id="github.com">
     <name translate="no">Leo Ring</name>
   </developer>
+  <supports>
+    <control>keyboard</control>
+    <control>pointing</control>
+    <control>touch</control>
+  </supports>
+  <requires>
+    <!-- Mobile/tablet AND desktop supported -->
+    <display_length compare="ge">360</display_length>
+  </requires>
   <!--
     Branding colors:
     https://docs.flathub.org/docs/for-app-authors/metainfo-guidelines/#brand-color
