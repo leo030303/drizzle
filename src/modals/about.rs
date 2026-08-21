@@ -16,17 +16,13 @@ impl SimpleComponent for AboutDialog {
     fn init_root() -> Self::Root {
         adw::AboutDialog::builder()
             .application_icon(APP_ID)
-            // Insert your license of choice here
-            // .license_type(gtk::License::MitX11)
-            // Insert your website here
-            // .website("https://gitlab.gnome.org/bilelmoussaoui/drizzle/")
-            // Insert your Issues page
-            // .issue_url("https://gitlab.gnome.org/World/Rust/drizzle/-/issues")
-            // Insert your application name here
-            .application_name("Relm4-template")
+            .license_type(gtk::License::Gpl30)
+            .website("https://github.com/leo030303/drizzle")
+            .issue_url("https://github.com/leo030303/drizzle/issues")
+            .application_name("Drizzle")
             .version(VERSION)
             .translator_credits("translator-credits")
-            .copyright("© 2024 Leo Ring")
+            .copyright("© 2026 Leo Ring")
             .developers(vec!["Leo Ring"])
             .designers(vec!["Leo Ring"])
             .build()
