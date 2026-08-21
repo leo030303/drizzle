@@ -1,59 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16px" height="16px" viewBox="0 0 16 16" version="1.1">
-<defs>
-<filter id="alpha" filterUnits="objectBoundingBox" x="0%" y="0%" width="100%" height="100%">
-  <feColorMatrix type="matrix" in="SourceGraphic" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0"/>
-</filter>
-<mask id="mask0">
-  <g filter="url(#alpha)">
-<rect x="0" y="0" width="16" height="16" style="fill:rgb(0%,0%,0%);fill-opacity:0.1;stroke:none;"/>
-  </g>
-</mask>
-<clipPath id="clip1">
-  <rect x="0" y="0" width="192" height="152"/>
-</clipPath>
-<g id="surface10818" clip-path="url(#clip1)">
-<path style="fill:none;stroke-width:0.99;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-dasharray:0.99,0.99;stroke-miterlimit:4;" d="M 123.503906 236 C 123.503906 268.863281 96.863281 295.503906 64 295.503906 C 31.136719 295.503906 4.496094 268.863281 4.496094 236 C 4.496094 203.136719 31.136719 176.496094 64 176.496094 C 96.863281 176.496094 123.503906 203.136719 123.503906 236 Z M 123.503906 236 " transform="matrix(1,0,0,1,8,-156)"/>
-</g>
-<mask id="mask1">
-  <g filter="url(#alpha)">
-<rect x="0" y="0" width="16" height="16" style="fill:rgb(0%,0%,0%);fill-opacity:0.1;stroke:none;"/>
-  </g>
-</mask>
-<clipPath id="clip2">
-  <rect x="0" y="0" width="192" height="152"/>
-</clipPath>
-<g id="surface10821" clip-path="url(#clip2)">
-<path style="fill:none;stroke-width:0.99;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-dasharray:0.99,0.99;stroke-miterlimit:4;" d="M 29.195312 180.496094 L 98.804688 180.496094 C 103.609375 180.496094 107.503906 184.046875 107.503906 188.425781 L 107.503906 283.574219 C 107.503906 287.953125 103.609375 291.503906 98.804688 291.503906 L 29.195312 291.503906 C 24.390625 291.503906 20.496094 287.953125 20.496094 283.574219 L 20.496094 188.425781 C 20.496094 184.046875 24.390625 180.496094 29.195312 180.496094 Z M 29.195312 180.496094 " transform="matrix(1,0,0,1,8,-156)"/>
-</g>
-<mask id="mask2">
-  <g filter="url(#alpha)">
-<rect x="0" y="0" width="16" height="16" style="fill:rgb(0%,0%,0%);fill-opacity:0.1;stroke:none;"/>
-  </g>
-</mask>
-<clipPath id="clip3">
-  <rect x="0" y="0" width="192" height="152"/>
-</clipPath>
-<g id="surface10824" clip-path="url(#clip3)">
-<path style="fill:none;stroke-width:0.99;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-dasharray:0.99,0.99;stroke-miterlimit:4;" d="M 20.417969 184.496094 L 107.582031 184.496094 C 111.957031 184.496094 115.503906 188.042969 115.503906 192.417969 L 115.503906 279.582031 C 115.503906 283.957031 111.957031 287.503906 107.582031 287.503906 L 20.417969 287.503906 C 16.042969 287.503906 12.496094 283.957031 12.496094 279.582031 L 12.496094 192.417969 C 12.496094 188.042969 16.042969 184.496094 20.417969 184.496094 Z M 20.417969 184.496094 " transform="matrix(1,0,0,1,8,-156)"/>
-</g>
-<mask id="mask3">
-  <g filter="url(#alpha)">
-<rect x="0" y="0" width="16" height="16" style="fill:rgb(0%,0%,0%);fill-opacity:0.1;stroke:none;"/>
-  </g>
-</mask>
-<clipPath id="clip4">
-  <rect x="0" y="0" width="192" height="152"/>
-</clipPath>
-<g id="surface10827" clip-path="url(#clip4)">
-<path style="fill:none;stroke-width:0.99;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-dasharray:0.99,0.99;stroke-miterlimit:4;" d="M 16.425781 200.496094 L 111.574219 200.496094 C 115.953125 200.496094 119.503906 204.390625 119.503906 209.195312 L 119.503906 278.804688 C 119.503906 283.609375 115.953125 287.503906 111.574219 287.503906 L 16.425781 287.503906 C 12.046875 287.503906 8.496094 283.609375 8.496094 278.804688 L 8.496094 209.195312 C 8.496094 204.390625 12.046875 200.496094 16.425781 200.496094 Z M 16.425781 200.496094 " transform="matrix(1,0,0,1,8,-156)"/>
-</g>
-</defs>
-<g id="surface10764">
-<rect x="0" y="0" width="16" height="16" style="fill:rgb(94.117647%,94.117647%,94.117647%);fill-opacity:1;stroke:none;"/>
-<use xlink:href="#surface10818" transform="matrix(1,0,0,1,-168,-16)" mask="url(#mask0)"/>
-<use xlink:href="#surface10821" transform="matrix(1,0,0,1,-168,-16)" mask="url(#mask1)"/>
-<use xlink:href="#surface10824" transform="matrix(1,0,0,1,-168,-16)" mask="url(#mask2)"/>
-<use xlink:href="#surface10827" transform="matrix(1,0,0,1,-168,-16)" mask="url(#mask3)"/>
-</g>
+<svg height="16px" viewBox="0 0 16 16" width="16px" xmlns="http://www.w3.org/2000/svg">
+    <g fill="none" stroke-linecap="round" stroke-miterlimit="18">
+        <g stroke="#000000">
+            <path d="m 9.640625 6.75 l -6.207031 6.574219 z m 0 0" stroke-width="0.1"/>
+            <path d="m 9.640625 6.75 l -6.207031 6.574219 z m 0 0" stroke-width="0.1"/>
+            <path d="m 9.640625 6.75 l -6.207031 6.574219 z m 0 0" stroke-width="0.1"/>
+            <path d="m 169.642711 178.749741 s -0.029606 -1.663147 -0.575666 -2.175383 c -0.470402 -0.43767 -6.296142 7.365827 -6.141535 8.241168 c 0.157897 0.878582 0.506586 0.508994 0.506586 0.508994 z m 0 0" stroke-width="0.788227" transform="matrix(1.187483 0 0 1.204888 -191.514269 -209.334422)"/>
+            <path d="m 169.724949 178.795129 s 1.657918 -0.068082 2.200689 0.447396 c 0.467112 0.440912 -6.977073 6.720669 -7.861954 6.616925 s -0.536192 -0.476574 -0.536192 -0.476574 z m 0 0" stroke-width="0.788227" transform="matrix(1.187483 0 0 1.204888 -191.514269 -209.334422)"/>
+            <path d="m 169.69883 178.776271 s 1.297155 -2.147642 1.970559 -2.184301 c 0.673404 -0.039715 0.81305 0.387981 0.831669 0.736247 c 0.015516 0.345211 -0.524448 0.901215 -0.524448 0.901215" stroke-width="0.788227" transform="matrix(1.258764 0 0 1.278656 -203.099003 -223.073757)"/>
+        </g>
+        <path d="m 127.446034 256.13954 s 13.192717 -1.43182 15.150134 0.340478 c 3.179457 2.886815 3.507167 6.758164 1.730058 9.354328 c -1.386056 2.026866 -5.5243 2.462685 -5.5243 2.462685" stroke="#63452c" stroke-width="4.0832" transform="matrix(0.929037 -0.996058 0.754804 0.804753 -382.963705 -45.228474)"/>
+    </g>
 </svg>
