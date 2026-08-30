@@ -9,7 +9,6 @@ pub struct HourEntryWidget {
     pub forecast_data: HourlyEntry,
 }
 
-// TODO Handle imperial units
 #[relm4::factory(pub)]
 impl FactoryComponent for HourEntryWidget {
     type Init = HourlyEntry;
@@ -45,15 +44,28 @@ impl FactoryComponent for HourEntryWidget {
             },
             gtk::Label {
                 set_css_classes: &["title-4"],
-                set_label: &format!("{}℃", self.forecast_data.temperature_2m),
+                set_label: &format!(
+                                "{}{}",
+                                self.forecast_data.temperature_2m,
+                                if self.forecast_data.is_metric {"℃"} else {"℉"}
+                            ),
                 set_margin_horizontal: 5,
             },
             gtk::Label {
-                set_label: &format!("Rain: {}mm / {}%", self.forecast_data.precipitation, self.forecast_data.precipitation_probability),
+                set_label: &format!(
+                                "Rain: {}{} / {}%",
+                                self.forecast_data.precipitation,
+                                if self.forecast_data.is_metric {"mm"} else {"in"},
+                                self.forecast_data.precipitation_probability
+                            ),
                 set_margin_horizontal: 5,
             },
             gtk::Label {
-                set_label: &format!("Wind: {} km/h", self.forecast_data.windspeed_10m),
+                set_label: &format!(
+                                "Wind: {} {}",
+                                self.forecast_data.windspeed_10m,
+                                if self.forecast_data.is_metric {"km/h"} else {"mph"}
+                            ),
                 set_margin_horizontal: 5,
             },
             gtk::Label {

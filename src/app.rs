@@ -2,6 +2,7 @@ use crate::config::APP_ID;
 use crate::modals::about::AboutDialog;
 use crate::modals::city_picker::CityPickerDialog;
 use crate::modals::city_picker::CityPickerDialogMsg;
+use crate::modals::preferences::PreferencesDialog;
 use crate::modals::shortcuts::ShortcutsDialog;
 use crate::ui::daily_entry_widget::DayEntryWidget;
 use crate::ui::hour_entry_widget::HourEntryWidget;
@@ -198,12 +199,24 @@ impl Component for App {
                                         },
                                         gtk::Label {
                                             #[watch]
-                                            set_label: &format!("{}℃", model.current_weather.as_ref().map(|current| current.temperature_2m.to_string()).unwrap_or_default()),
+                                            set_label: &model.current_weather.as_ref().map(|current|
+                                                format!(
+                                                    "{}{}",
+                                                    current.temperature_2m,
+                                                    if current.is_metric {"℃"} else {"℉"}
+                                                )
+                                            ).unwrap_or_default(),
                                             set_css_classes: &["current-temp-label"],
                                         },
                                         gtk::Label {
                                             #[watch]
-                                            set_label: &format!("Feels like {}℃", model.current_weather.as_ref().map(|current| current.apparent_temperature.to_string()).unwrap_or_default()),
+                                            set_label: &model.current_weather.as_ref().map(|current|
+                                                format!(
+                                                    "Feels like {}{}",
+                                                    current.apparent_temperature,
+                                                    if current.is_metric {"℃"} else {"℉"}
+                                                )
+                                            ).unwrap_or_default(),
                                             set_css_classes: &["current-apparent-temp-label"],
                                             set_margin_bottom: 10,
                                             set_margin_start: 30,
@@ -351,6 +364,18 @@ impl Component for App {
             })
         };
 
+        let preferences_action = {
+            RelmAction::<PreferencesAction>::new_stateless(clone!(
+                #[strong]
+                sender,
+                move |_| {
+                    PreferencesDialog::builder()
+                        .launch(())
+                        .forward(sender.input_sender(), |response| response);
+                },
+            ))
+        };
+
         let quit_action = {
             RelmAction::<QuitAction>::new_stateless(clone!(
                 #[strong]
@@ -366,6 +391,7 @@ impl Component for App {
 
         actions.add_action(shortcuts_action);
         actions.add_action(about_action);
+        actions.add_action(preferences_action);
         actions.add_action(quit_action);
         actions.register_for_widget(&widgets.main_window);
 
@@ -381,8 +407,9 @@ impl Component for App {
             AppMsg::RefreshWeatherData => {
                 self.is_loading = true;
                 if let Some(current_city) = self.current_city.clone() {
+                    let settings = gio::Settings::new(APP_ID);
+                    let is_metric = settings.boolean("use-metric");
                     sender.oneshot_command(async move {
-                        let is_metric = true;
                         let current_weather =
                             get_weather_current(&current_city, is_metric).await.unwrap();
                         let hourly_entries =

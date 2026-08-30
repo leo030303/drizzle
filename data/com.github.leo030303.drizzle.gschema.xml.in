@@ -21,5 +21,9 @@
       <default>"FourHour"</default>
       <summary>The timespan to display recommendations for</summary>
     </key>
+    <key name="use-metric" type="b">
+      <default>true</default>
+      <summary>Whether to use metric units, if false use imperial</summary>
+    </key>
   </schema>
 </schemalist>

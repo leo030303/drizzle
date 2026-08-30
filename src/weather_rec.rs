@@ -98,14 +98,19 @@ impl RecommendationTimespan {
 
 // Corresponds to beaufort scale 6 Strong Breeze, too much wind for an umbrella
 const WINDS_UMBRELLA_THRESHOLD_METRIC: f64 = 39.0;
+const WINDS_UMBRELLA_THRESHOLD_IMPERIAL: f64 = 24.0;
 // Corresponds to beaufort scale 7 Near Gale
 const HIGH_WINDS_THRESHOLD_METRIC: f64 = 50.0;
+const HIGH_WINDS_THRESHOLD_IMPERIAL: f64 = 31.0;
 // Warm enough for shorts/summer clothes
 const SHORTS_TEMP_THRESHOLD_METRIC: f64 = 20.0;
+const SHORTS_TEMP_THRESHOLD_IMPERIAL: f64 = 68.0;
 // Cold enough to need a jumper/jacket
-const JUMPER_TEMP_THRESHOLD_METRIC: f64 = 15.0;
+const JUMPER_TEMP_THRESHOLD_METRIC: f64 = 12.0;
+const JUMPER_TEMP_THRESHOLD_IMPERIAL: f64 = 54.0;
+const FREEZING_TEMP_THRESHOLD_METRIC: f64 = 0.0;
+const FREEZING_TEMP_THRESHOLD_IMPERIAL: f64 = 32.0;
 
-// TODO Handle imperial here
 pub fn get_recommendations(
     weather_conditions: &[HourlyEntry],
     timespan: &RecommendationTimespan,
@@ -138,17 +143,6 @@ pub fn get_recommendations(
             UvIndex::VeryHigh => recommendations_list_raw.push(WeatherRecommendation::HighUvRisk),
             UvIndex::Extreme => recommendations_list_raw.push(WeatherRecommendation::HighUvRisk),
         }
-        if hour_entry.windspeed_10m > HIGH_WINDS_THRESHOLD_METRIC {
-            recommendations_list_raw.push(WeatherRecommendation::StrongWinds);
-        }
-        // If theres rain bring umbrella, unless its too windy then bring a coat
-        if hour_entry.weathercode.is_rain() {
-            if hour_entry.windspeed_10m > WINDS_UMBRELLA_THRESHOLD_METRIC {
-                recommendations_list_raw.push(WeatherRecommendation::ExpectRainStrongWinds);
-            } else {
-                recommendations_list_raw.push(WeatherRecommendation::ExpectRainLightWinds);
-            }
-        }
         if hour_entry.weathercode.is_snow() {
             recommendations_list_raw.push(WeatherRecommendation::ExpectSnow);
         }
@@ -158,13 +152,46 @@ pub fn get_recommendations(
         if hour_entry.weathercode.is_fog() {
             recommendations_list_raw.push(WeatherRecommendation::ExpectFog);
         }
-        if hour_entry.apparent_temperature > SHORTS_TEMP_THRESHOLD_METRIC {
-            recommendations_list_raw.push(WeatherRecommendation::WearShorts);
-        } else if hour_entry.apparent_temperature < JUMPER_TEMP_THRESHOLD_METRIC {
-            recommendations_list_raw.push(WeatherRecommendation::WearJumper);
-        }
-        if hour_entry.temperature_2m <= 0.0 {
-            recommendations_list_raw.push(WeatherRecommendation::Freezing);
+        if hour_entry.is_metric {
+            if hour_entry.apparent_temperature > SHORTS_TEMP_THRESHOLD_METRIC {
+                recommendations_list_raw.push(WeatherRecommendation::WearShorts);
+            } else if hour_entry.apparent_temperature < JUMPER_TEMP_THRESHOLD_METRIC {
+                recommendations_list_raw.push(WeatherRecommendation::WearJumper);
+            }
+            if hour_entry.temperature_2m <= FREEZING_TEMP_THRESHOLD_METRIC {
+                recommendations_list_raw.push(WeatherRecommendation::Freezing);
+            }
+            if hour_entry.windspeed_10m > HIGH_WINDS_THRESHOLD_METRIC {
+                recommendations_list_raw.push(WeatherRecommendation::StrongWinds);
+            }
+            // If theres rain bring umbrella, unless its too windy then bring a coat
+            if hour_entry.weathercode.is_rain() {
+                if hour_entry.windspeed_10m > WINDS_UMBRELLA_THRESHOLD_METRIC {
+                    recommendations_list_raw.push(WeatherRecommendation::ExpectRainStrongWinds);
+                } else {
+                    recommendations_list_raw.push(WeatherRecommendation::ExpectRainLightWinds);
+                }
+            }
+        } else {
+            if hour_entry.apparent_temperature > SHORTS_TEMP_THRESHOLD_IMPERIAL {
+                recommendations_list_raw.push(WeatherRecommendation::WearShorts);
+            } else if hour_entry.apparent_temperature < JUMPER_TEMP_THRESHOLD_IMPERIAL {
+                recommendations_list_raw.push(WeatherRecommendation::WearJumper);
+            }
+            if hour_entry.temperature_2m <= FREEZING_TEMP_THRESHOLD_IMPERIAL {
+                recommendations_list_raw.push(WeatherRecommendation::Freezing);
+            }
+            if hour_entry.windspeed_10m > HIGH_WINDS_THRESHOLD_IMPERIAL {
+                recommendations_list_raw.push(WeatherRecommendation::StrongWinds);
+            }
+            // If theres rain bring umbrella, unless its too windy then bring a coat
+            if hour_entry.weathercode.is_rain() {
+                if hour_entry.windspeed_10m > WINDS_UMBRELLA_THRESHOLD_IMPERIAL {
+                    recommendations_list_raw.push(WeatherRecommendation::ExpectRainStrongWinds);
+                } else {
+                    recommendations_list_raw.push(WeatherRecommendation::ExpectRainLightWinds);
+                }
+            }
         }
         for recommendation in recommendations_list_raw {
             recommendations_list_with_times.push((

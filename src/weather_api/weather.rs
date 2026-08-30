@@ -23,6 +23,7 @@ pub struct CurrentWeather {
     pub temperature_2m: f64,
     pub apparent_temperature: f64,
     pub is_day: bool,
+    pub is_metric: bool,
     pub weathercode: WeatherCode,
 }
 
@@ -35,11 +36,12 @@ pub struct CurrentWeatherRaw {
 }
 
 impl CurrentWeatherRaw {
-    pub fn process(&self) -> CurrentWeather {
+    pub fn process(&self, is_metric: bool) -> CurrentWeather {
         CurrentWeather {
             temperature_2m: self.temperature_2m,
             apparent_temperature: self.apparent_temperature,
             is_day: self.is_day == 1,
+            is_metric,
             weathercode: WeatherCode::from(self.weathercode),
         }
     }
@@ -83,6 +85,7 @@ pub struct HourlyEntry {
     pub windspeed_10m: f64,
     pub uv_index: UvIndex,
     pub is_day: bool,
+    pub is_metric: bool,
 }
 
 #[derive(Debug, Clone)]
@@ -97,10 +100,11 @@ pub struct DailyEntry {
     pub precipitation_sum: f64,
     pub precipitation_probability_max: f64,
     pub windspeed_10m_max: f64,
+    pub is_metric: bool,
 }
 
 impl HourlyWeatherRaw {
-    pub fn to_entries(&self, utc_offset: i64) -> Vec<HourlyEntry> {
+    pub fn to_entries(&self, utc_offset: i64, is_metric: bool) -> Vec<HourlyEntry> {
         self.time
             .iter()
             .enumerate()
@@ -114,13 +118,14 @@ impl HourlyWeatherRaw {
                 windspeed_10m: self.windspeed_10m[i],
                 uv_index: UvIndex::from(self.uv_index[i]),
                 is_day: self.is_day[i] == 1,
+                is_metric,
             })
             .collect()
     }
 }
 
 impl DailyWeatherRaw {
-    pub fn to_entries(&self, utc_offset: i64) -> Vec<DailyEntry> {
+    pub fn to_entries(&self, utc_offset: i64, is_metric: bool) -> Vec<DailyEntry> {
         self.time
             .iter()
             .enumerate()
@@ -135,6 +140,7 @@ impl DailyWeatherRaw {
                 precipitation_sum: self.precipitation_sum[i],
                 precipitation_probability_max: self.precipitation_probability_max[i],
                 windspeed_10m_max: self.windspeed_10m_max[i],
+                is_metric,
             })
             .collect()
     }
@@ -158,14 +164,15 @@ pub async fn get_weather_current(
         CURRENT_METRICS_LIST.join(",")
     );
     if !is_metric {
-        weather_url.push_str("&temperature_unit=fahrenheit&wind_speed_unit=mph");
+        weather_url
+            .push_str("&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch");
     }
     let weather_data = reqwest::get(weather_url)
         .await?
         .json::<WeatherResponse>()
         .await?;
 
-    Ok(weather_data.current.unwrap().process())
+    Ok(weather_data.current.unwrap().process(is_metric))
 }
 
 pub async fn get_weather_hourly(
@@ -190,7 +197,8 @@ pub async fn get_weather_hourly(
         HOURLY_METRICS_LIST.join(",")
     );
     if !is_metric {
-        weather_url.push_str("&temperature_unit=fahrenheit&wind_speed_unit=mph");
+        weather_url
+            .push_str("&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch");
     }
     let weather_data = reqwest::get(weather_url)
         .await?
@@ -200,7 +208,7 @@ pub async fn get_weather_hourly(
     Ok(weather_data
         .hourly
         .unwrap()
-        .to_entries(weather_data.utc_offset_seconds))
+        .to_entries(weather_data.utc_offset_seconds, is_metric))
 }
 
 pub async fn get_weather_daily(
@@ -226,7 +234,8 @@ pub async fn get_weather_daily(
         DAILY_METRICS_LIST.join(",")
     );
     if !is_metric {
-        weather_url.push_str("&temperature_unit=fahrenheit&wind_speed_unit=mph");
+        weather_url
+            .push_str("&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch");
     }
     let weather_data = reqwest::get(weather_url)
         .await?
@@ -236,5 +245,5 @@ pub async fn get_weather_daily(
     Ok(weather_data
         .daily
         .unwrap()
-        .to_entries(weather_data.utc_offset_seconds))
+        .to_entries(weather_data.utc_offset_seconds, is_metric))
 }

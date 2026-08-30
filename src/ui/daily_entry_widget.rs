@@ -52,7 +52,11 @@ impl FactoryComponent for DayEntryWidget {
                     set_icon_size: gtk::IconSize::Normal,
                 },
                 gtk::Label {
-                    set_label: &format!("{}℃", self.forecast_data.temperature_2m_max),
+                    set_label: &format!(
+                                    "{}{}",
+                                    self.forecast_data.temperature_2m_max,
+                                    if self.forecast_data.is_metric {"℃"} else {"℉"}
+                                ),
                     set_margin_end: 10,
                 },
                 gtk::Image {
@@ -60,7 +64,11 @@ impl FactoryComponent for DayEntryWidget {
                     set_icon_size: gtk::IconSize::Normal,
                 },
                 gtk::Label {
-                    set_label: &format!("{}℃", self.forecast_data.temperature_2m_min),
+                    set_label: &format!(
+                                    "{}{}",
+                                    self.forecast_data.temperature_2m_min,
+                                    if self.forecast_data.is_metric {"℃"} else {"℉"}
+                                ),
                 },
             },
             gtk::Box{
@@ -87,11 +95,20 @@ impl FactoryComponent for DayEntryWidget {
                 },
             },
             gtk::Label {
-                set_label: &format!("Rain: {}mm / {}%", self.forecast_data.precipitation_sum, self.forecast_data.precipitation_probability_max),
+                set_label: &format!(
+                                "Rain: {}{} / {}%",
+                                self.forecast_data.precipitation_sum,
+                                if self.forecast_data.is_metric {"mm"} else {"in"},
+                                self.forecast_data.precipitation_probability_max
+                            ),
                 set_margin_horizontal: 5,
             },
             gtk::Label {
-                set_label: &format!("Wind: {} km/h", self.forecast_data.windspeed_10m_max),
+                set_label: &format!(
+                                "Wind: {} {}",
+                                self.forecast_data.windspeed_10m_max,
+                                if self.forecast_data.is_metric {"km/h"} else {"mph"}
+                            ),
                 set_margin_horizontal: 5,
             },
             gtk::Label {
