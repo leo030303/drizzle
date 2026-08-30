@@ -900,10 +900,10 @@
      borderopacity="0.25490196"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="4.8939824"
-     inkscape:cx="59.358612"
-     inkscape:cy="74.785721"
-     inkscape:current-layer="g6"
+     inkscape:zoom="6.7399785"
+     inkscape:cx="56.454186"
+     inkscape:cy="71.810318"
+     inkscape:current-layer="g11"
      showgrid="false"
      inkscape:grid-bbox="true"
      inkscape:document-units="px"
@@ -2997,17 +2997,12 @@
              inkscape:label="sash_shine"
              d="m 241.56753,-119.65933 0.34607,4.42247 3.38396,0.098 2.02261,2.2e-4 3.38753,-0.0694 -7.5e-4,-1.51178 -0.25616,-2.87217 z"
              transform="matrix(4.7299348e-4,0.99999989,-0.99667862,-0.08143547,8.5613929e-7,7.0840122e-7)" />
-          <rect
-             style="display:inline;opacity:1;fill:url(#radialGradient21);fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.817113;stroke-linecap:round;stroke-miterlimit:18;stroke-dasharray:none;stroke-opacity:1;enable-background:new"
+          <path
              id="rect20"
-             width="22.195999"
-             height="84.313622"
-             x="242.71666"
-             y="-114.55523"
-             ry="0"
-             transform="matrix(0.0649383,0.99788928,-0.99985823,0.01683824,0,0)"
+             style="display:inline;opacity:1;fill:url(#radialGradient21);fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.817113;stroke-linecap:round;stroke-miterlimit:18;stroke-dasharray:none;stroke-opacity:1;enable-background:new"
              inkscape:label="body_shine"
-             sodipodi:insensitive="true" />
+             d="M 248.79938 -113.36455 L 253.65578 -102.84315 L 253.49233 -98.567372 C 253.49233 -98.567372 248.07936 -88.920275 247.33833 -77.901049 C 245.68215 -53.273464 255.20932 -36.54443 255.20932 -36.54443 L 242.71776 -43.218025 L 242.71727 -30.24122 L 264.91287 -30.241333 L 264.913 -114.55526 L 254.14143 -114.55485 L 256.437 -111.05298 L 248.79938 -113.36455 z "
+             transform="matrix(0.0649383,0.99788928,-0.99985823,0.01683824,0,0)" />
           <path
              id="rect33"
              style="opacity:1;fill:url(#linearGradient35);fill-rule:evenodd;stroke:none;stroke-width:0.807771;stroke-linecap:round;stroke-miterlimit:18;stroke-dasharray:none;stroke-opacity:1"
