@@ -276,6 +276,13 @@ impl Component for App {
                                     set_margin_all: 10,
                                 }
                             },
+                            gtk::Label {
+                                set_label: "Weather data from <a href='https://open-meteo.com/'>Open-Meteo</a>.",
+                                set_wrap: true,
+                                set_use_markup: true,
+                                set_margin_vertical: 5,
+                                set_css_classes: &["caption", "dim-label"],
+                            },
                         }
                     }
                 }
