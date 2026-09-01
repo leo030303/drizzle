@@ -28,11 +28,11 @@ impl From<f64> for UvIndex {
 impl Display for UvIndex {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            UvIndex::Low => f.write_str("Low"),
-            UvIndex::Moderate => f.write_str("Moderate"),
-            UvIndex::High => f.write_str("High"),
-            UvIndex::VeryHigh => f.write_str("Very High"),
-            UvIndex::Extreme => f.write_str("Extreme"),
+            Self::Low => f.write_str("Low"),
+            Self::Moderate => f.write_str("Moderate"),
+            Self::High => f.write_str("High"),
+            Self::VeryHigh => f.write_str("Very High"),
+            Self::Extreme => f.write_str("Extreme"),
         }
     }
 }

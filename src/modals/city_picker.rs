@@ -1,5 +1,6 @@
 use relm4::{
     Component, ComponentParts, ComponentSender, RelmWidgetExt,
+    abstractions::Toaster,
     adw::{self, prelude::AdwDialogExt},
     gtk::{
         self,
@@ -19,6 +20,7 @@ pub struct CityPickerDialog {
     search_results: FactoryVecDeque<CitySearchResultRow>,
     recent_cities_list: Vec<GeoResponse>,
     search_entry_widget: gtk::SearchEntry,
+    toaster: Toaster,
 }
 
 #[derive(Debug)]
@@ -27,6 +29,8 @@ pub enum CityPickerDialogMsg {
     SearchCities,
     SelectCity(GeoResponse),
     SetRecentCities(Vec<GeoResponse>),
+    ShowNoWifiErrorToast,
+    SetCitiesList(Vec<GeoResponse>),
 }
 
 #[relm4::component(pub)]
@@ -34,7 +38,7 @@ impl Component for CityPickerDialog {
     type Init = ();
     type Input = CityPickerDialogMsg;
     type Output = AppMsg;
-    type CommandOutput = Vec<GeoResponse>;
+    type CommandOutput = CityPickerDialogMsg;
     type Widgets = CityPickerWidgets;
 
     view! {
@@ -44,38 +48,43 @@ impl Component for CityPickerDialog {
                 add_top_bar = &adw::HeaderBar {},
                 #[wrap(Some)]
                 set_content = &gtk::Box{
-                    set_orientation: gtk::Orientation::Vertical,
-                    set_spacing: 10,
-                    set_margin_all: 20,
-
-
-                    gtk::Box {
-                        set_orientation: gtk::Orientation::Horizontal,
-                        set_spacing: 5,
-                        set_halign: gtk::Align::Center,
-                        #[name = "search_entry"]
-                        gtk::SearchEntry {
-                            set_placeholder_text: Some("Search for a city"),
-                            connect_activate => CityPickerDialogMsg::SearchCities,
-                            connect_search_changed[sender] => move |entry| {
-                                sender.input(CityPickerDialogMsg::SearchQueryChanged(entry.text().to_string()));
-                            },
-                        },
-                        gtk::Button {
-                            set_icon_name: "system-search-symbolic",
-                            connect_clicked => CityPickerDialogMsg::SearchCities
-                        },
-                    },
-
                     #[local_ref]
-                    cities_list_widget -> gtk::ListBox {
-                        set_selection_mode: gtk::SelectionMode::None,
-                        set_css_classes: &["boxed-list"],
-                        set_margin_top: 10,
+                    toast_overlay -> adw::ToastOverlay {
+                        set_vexpand: true,
+                        gtk::Box{
+                            set_orientation: gtk::Orientation::Vertical,
+                            set_spacing: 10,
+                            set_margin_all: 20,
+
+
+                            gtk::Box {
+                                set_orientation: gtk::Orientation::Horizontal,
+                                set_spacing: 5,
+                                set_halign: gtk::Align::Center,
+                                #[name = "search_entry"]
+                                gtk::SearchEntry {
+                                    set_placeholder_text: Some("Search for a city"),
+                                    connect_activate => CityPickerDialogMsg::SearchCities,
+                                    connect_search_changed[sender] => move |entry| {
+                                        sender.input(CityPickerDialogMsg::SearchQueryChanged(entry.text().to_string()));
+                                    },
+                                },
+                                gtk::Button {
+                                    set_icon_name: "system-search-symbolic",
+                                    connect_clicked => CityPickerDialogMsg::SearchCities
+                                },
+                            },
+
+                            #[local_ref]
+                            cities_list_widget -> gtk::ListBox {
+                                set_selection_mode: gtk::SelectionMode::None,
+                                set_css_classes: &["boxed-list"],
+                                set_margin_top: 10,
+                            }
+                        },
                     }
                 },
-
-                },
+            }
         }
     }
 
@@ -88,12 +97,15 @@ impl Component for CityPickerDialog {
             .launch(gtk::ListBox::default())
             .forward(sender.input_sender(), |output| output);
         let cities_list_widget = search_results.widget();
+        let toaster = Toaster::default();
+        let toast_overlay = toaster.overlay_widget();
         let widgets = view_output!();
         let model = Self {
             search_query: String::new(),
             search_results,
             recent_cities_list: vec![],
             search_entry_widget: widgets.search_entry.clone(),
+            toaster,
         };
 
         ComponentParts { model, widgets }
@@ -116,11 +128,20 @@ impl Component for CityPickerDialog {
                     return;
                 }
                 let search_query = self.search_query.clone();
-                sender
-                    .oneshot_command(async move { search_city_list(&search_query).await.unwrap() });
+                sender.oneshot_command(async move {
+                    match search_city_list(&search_query).await {
+                        Ok(city_list) => CityPickerDialogMsg::SetCitiesList(city_list),
+                        Err(e) => {
+                            println!("Error searching for city: {e}");
+                            CityPickerDialogMsg::ShowNoWifiErrorToast
+                        }
+                    }
+                });
             }
             CityPickerDialogMsg::SelectCity(city) => {
-                sender.output(AppMsg::SelectCity(city)).unwrap();
+                sender.output(AppMsg::SelectCity(city)).expect(
+                    "Called sender.output when all recievers are dropped, please report this bug",
+                );
                 self.search_entry_widget.set_text("");
                 root.close();
             }
@@ -133,19 +154,28 @@ impl Component for CityPickerDialog {
                     }
                 }
             }
+            CityPickerDialogMsg::ShowNoWifiErrorToast => {
+                let toast = adw::Toast::builder()
+                    .title("Search Error: check internet connection")
+                    .timeout(0)
+                    .build();
+                self.toaster.add_toast(toast);
+            }
+            CityPickerDialogMsg::SetCitiesList(cities) => {
+                self.search_results.guard().clear();
+
+                for city in cities {
+                    self.search_results.guard().push_back(city);
+                }
+            }
         }
     }
-
     fn update_cmd(
         &mut self,
-        cities: Self::CommandOutput,
-        _sender: ComponentSender<Self>,
-        _root: &Self::Root,
+        message: Self::CommandOutput,
+        sender: ComponentSender<Self>,
+        root: &Self::Root,
     ) {
-        self.search_results.guard().clear();
-
-        for city in cities {
-            self.search_results.guard().push_back(city);
-        }
+        self.update(message, sender, root);
     }
 }

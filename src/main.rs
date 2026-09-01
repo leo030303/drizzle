@@ -22,7 +22,7 @@ mod icon_names {
 }
 
 fn main() {
-    gtk::init().unwrap();
+    gtk::init().expect("Failed GTK init");
 
     // Enable logging
     tracing_subscriber::fmt()
@@ -53,8 +53,10 @@ fn main() {
             "/com/github/leo030303/drizzle/style.css",
             gio::ResourceLookupFlags::NONE,
         )
-        .unwrap();
+        .expect("Failed data lookup for stylesheet, this app should be built as a flatpak");
 
-    relm4::set_global_css(&glib::GString::from_utf8_checked(data.to_vec()).unwrap());
+    relm4::set_global_css(
+        &glib::GString::from_utf8_checked(data.to_vec()).expect("Invalid CSS file"),
+    );
     app.visible_on_activate(false).run::<App>(());
 }

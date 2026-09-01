@@ -7,7 +7,7 @@ pub struct TimedRecommendation {
     pub end_time: i64,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum WeatherRecommendation {
     LowUvRisk,
     HighUvRisk,
@@ -26,14 +26,14 @@ pub enum WeatherRecommendation {
 
 impl TimedRecommendation {
     pub fn get_text(&self) -> String {
-        let start_time = chrono::DateTime::from_timestamp_secs(self.start_time)
-            .unwrap()
-            .format("%l%P")
-            .to_string();
-        let end_time = chrono::DateTime::from_timestamp_secs(self.end_time)
-            .unwrap()
-            .format("%l%P")
-            .to_string();
+        let start_time = chrono::DateTime::from_timestamp_secs(self.start_time).map_or_else(
+            || String::from("Invalid Timestamp"),
+            |time| time.format("%l%P").to_string(),
+        );
+        let end_time = chrono::DateTime::from_timestamp_secs(self.end_time).map_or_else(
+            || String::from("Invalid Timestamp"),
+            |time| time.format("%l%P").to_string(),
+        );
         match &self.recommendation {
             WeatherRecommendation::LowUvRisk => format!("Wear suncream: {start_time} - {end_time}"),
             WeatherRecommendation::HighUvRisk => {
@@ -77,21 +77,20 @@ pub enum RecommendationTimespan {
 }
 
 impl RecommendationTimespan {
-    pub fn to_name(&self) -> &'static str {
+    pub const fn to_name(&self) -> &'static str {
         match self {
-            RecommendationTimespan::FourHour => "FourHour",
-            RecommendationTimespan::EightHour => "EightHour",
-            RecommendationTimespan::TwelveHour => "TwelveHour",
-            RecommendationTimespan::TwentyFourHour => "TwentyFourHour",
+            Self::FourHour => "FourHour",
+            Self::EightHour => "EightHour",
+            Self::TwelveHour => "TwelveHour",
+            Self::TwentyFourHour => "TwentyFourHour",
         }
     }
     pub fn from_name(name: &str) -> Self {
         match name {
-            "FourHour" => RecommendationTimespan::FourHour,
-            "EightHour" => RecommendationTimespan::EightHour,
-            "TwelveHour" => RecommendationTimespan::TwelveHour,
-            "TwentyFourHour" => RecommendationTimespan::TwentyFourHour,
-            _ => RecommendationTimespan::TwentyFourHour,
+            "FourHour" => Self::FourHour,
+            "EightHour" => Self::EightHour,
+            "TwelveHour" => Self::TwelveHour,
+            _ => Self::TwentyFourHour,
         }
     }
 }
@@ -134,14 +133,16 @@ pub fn get_recommendations(
             .map(|item| item.0)
             .unwrap_or_default(),
     };
-    relevant_conditions.iter().for_each(|hour_entry| {
+    for hour_entry in relevant_conditions {
         let mut recommendations_list_raw = vec![];
         match hour_entry.uv_index {
             UvIndex::Low => {}
-            UvIndex::Moderate => recommendations_list_raw.push(WeatherRecommendation::LowUvRisk),
-            UvIndex::High => recommendations_list_raw.push(WeatherRecommendation::LowUvRisk),
-            UvIndex::VeryHigh => recommendations_list_raw.push(WeatherRecommendation::HighUvRisk),
-            UvIndex::Extreme => recommendations_list_raw.push(WeatherRecommendation::HighUvRisk),
+            UvIndex::Moderate | UvIndex::High => {
+                recommendations_list_raw.push(WeatherRecommendation::LowUvRisk);
+            }
+            UvIndex::VeryHigh | UvIndex::Extreme => {
+                recommendations_list_raw.push(WeatherRecommendation::HighUvRisk);
+            }
         }
         if hour_entry.weathercode.is_snow() {
             recommendations_list_raw.push(WeatherRecommendation::ExpectSnow);
@@ -197,10 +198,10 @@ pub fn get_recommendations(
             recommendations_list_with_times.push((
                 recommendation,
                 hour_entry.time,
-                hour_entry.time + 60 * 60,
+                hour_entry.time.saturating_add(60 * 60),
             ));
         }
-    });
+    }
 
     let mut grouped_recommendations: Vec<TimedRecommendation> = vec![];
     for (recommendation, start_time, end_time) in recommendations_list_with_times {

@@ -67,7 +67,7 @@ impl FactoryComponent for CitySearchResultRow {
             CityRowMsg::Clicked => {
                 sender
                     .output(CityPickerDialogMsg::SelectCity(self.city.clone()))
-                    .unwrap();
+                    .expect("Called sender.output when all recievers are dropped, please report this bug");
             }
         }
     }

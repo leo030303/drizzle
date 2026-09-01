@@ -37,7 +37,7 @@ impl FactoryComponent for DayEntryWidget {
                 },
                 gtk::Label {
                     set_css_classes: &["title-2"],
-                    set_label: &chrono::DateTime::from_timestamp_secs(self.forecast_data.time).unwrap().format("%a %d/%m").to_string(),
+                    set_label: &chrono::DateTime::from_timestamp_secs(self.forecast_data.time).map_or_else(|| String::from("Invalid Timestamp"), |time| time.format("%a %d/%m").to_string()),
                 },
             },
             gtk::Box{
@@ -83,7 +83,7 @@ impl FactoryComponent for DayEntryWidget {
                     set_icon_size: gtk::IconSize::Normal,
                 },
                 gtk::Label {
-                    set_label: &chrono::DateTime::from_timestamp_secs(self.forecast_data.sunrise).unwrap().format("%H:%M").to_string(),
+                    set_label: &chrono::DateTime::from_timestamp_secs(self.forecast_data.sunrise).map_or_else(|| String::from("Invalid Timestamp"), |time| time.format("%H:%M").to_string()),
                     set_margin_end: 10,
                 },
                 gtk::Image {
@@ -91,7 +91,7 @@ impl FactoryComponent for DayEntryWidget {
                     set_icon_size: gtk::IconSize::Normal,
                 },
                 gtk::Label {
-                    set_label: &chrono::DateTime::from_timestamp_secs(self.forecast_data.sunset).unwrap().format("%H:%M").to_string(),
+                    set_label: &chrono::DateTime::from_timestamp_secs(self.forecast_data.sunset).map_or_else(|| String::from("Invalid Timestamp"), |time| time.format("%H:%M").to_string()),
                 },
             },
             gtk::Label {

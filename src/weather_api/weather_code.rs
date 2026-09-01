@@ -1,8 +1,8 @@
 use serde::Deserialize;
 
 /// WMO Weather interpretation codes (WW)
-/// See https://open-meteo.com/en/docs#weather_variable_documentation
-#[derive(Debug, Deserialize, Clone, PartialEq)]
+/// See <https://open-meteo.com/en/docs#weather_variable_documentation>
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 pub enum WeatherCode {
     ClearSky,
     MainlyClear,
@@ -36,227 +36,223 @@ pub enum WeatherCode {
 }
 
 impl WeatherCode {
-    pub fn get_icon_name(&self, is_day: bool) -> &'static str {
+    pub const fn get_icon_name(&self, is_day: bool) -> &'static str {
         match self {
-            WeatherCode::ClearSky | WeatherCode::MainlyClear => {
+            Self::ClearSky | Self::MainlyClear => {
                 if is_day {
                     "clear-day"
                 } else {
                     "clear-night"
                 }
             }
-            WeatherCode::PartlyCloudy => {
+            Self::PartlyCloudy => {
                 if is_day {
                     "partly-cloudy-day"
                 } else {
                     "partly-cloudy-night"
                 }
             }
-            WeatherCode::Overcast => "cloudy",
-            WeatherCode::Fog | WeatherCode::DepositingRimeFog => "foggy",
-            WeatherCode::LightRainShowers
-            | WeatherCode::ModerateRainShowers
-            | WeatherCode::ViolentRainShowers
-            | WeatherCode::LightDrizzle
-            | WeatherCode::ModerateDrizzle
-            | WeatherCode::DenseDrizzle
-            | WeatherCode::LightFreezingDrizzle
-            | WeatherCode::DenseFreezingDrizzle
-            | WeatherCode::LightRain
-            | WeatherCode::ModerateRain
-            | WeatherCode::HeavyRain
-            | WeatherCode::LightFreezingRain
-            | WeatherCode::HeavyFreezingRain => "rainy",
-            WeatherCode::LightSnowShowers
-            | WeatherCode::HeavySnowShowers
-            | WeatherCode::LightSnowFall
-            | WeatherCode::ModerateSnowFall
-            | WeatherCode::HeavySnowFall
-            | WeatherCode::SnowGrains => "snowing",
-            WeatherCode::Thunderstorm
-            | WeatherCode::ThunderstormLightHail
-            | WeatherCode::ThunderstormHeavyHail => "thunderstorm",
-            WeatherCode::NoMatch => "",
+            Self::Overcast => "cloudy",
+            Self::Fog | Self::DepositingRimeFog => "foggy",
+            Self::LightRainShowers
+            | Self::ModerateRainShowers
+            | Self::ViolentRainShowers
+            | Self::LightDrizzle
+            | Self::ModerateDrizzle
+            | Self::DenseDrizzle
+            | Self::LightFreezingDrizzle
+            | Self::DenseFreezingDrizzle
+            | Self::LightRain
+            | Self::ModerateRain
+            | Self::HeavyRain
+            | Self::LightFreezingRain
+            | Self::HeavyFreezingRain => "rainy",
+            Self::LightSnowShowers
+            | Self::HeavySnowShowers
+            | Self::LightSnowFall
+            | Self::ModerateSnowFall
+            | Self::HeavySnowFall
+            | Self::SnowGrains => "snowing",
+            Self::Thunderstorm | Self::ThunderstormLightHail | Self::ThunderstormHeavyHail => {
+                "thunderstorm"
+            }
+            Self::NoMatch => "",
         }
     }
 
-    pub fn get_status_image_resource(&self, is_day: bool) -> &'static str {
+    pub const fn get_status_image_resource(&self, is_day: bool) -> &'static str {
         match self {
-            WeatherCode::ClearSky | WeatherCode::MainlyClear => {
+            Self::ClearSky | Self::MainlyClear => {
                 if is_day {
                     "/com/github/leo030303/drizzle/weather_status_icons/drizzle-clear.svg"
                 } else {
                     "/com/github/leo030303/drizzle/weather_status_icons/drizzle-clear-night.svg"
                 }
             }
-            WeatherCode::PartlyCloudy => {
+            Self::PartlyCloudy => {
                 if is_day {
                     "/com/github/leo030303/drizzle/weather_status_icons/drizzle-few-clouds.svg"
                 } else {
                     "/com/github/leo030303/drizzle/weather_status_icons/drizzle-few-clouds-night.svg"
                 }
             }
-            WeatherCode::Overcast => {
+            Self::Overcast => {
                 "/com/github/leo030303/drizzle/weather_status_icons/drizzle-overcast.svg"
             }
-            WeatherCode::Fog | WeatherCode::DepositingRimeFog => {
+            Self::Fog | Self::DepositingRimeFog => {
                 "/com/github/leo030303/drizzle/weather_status_icons/drizzle-fog.svg"
             }
-            WeatherCode::LightRainShowers
-            | WeatherCode::LightDrizzle
-            | WeatherCode::ModerateDrizzle
-            | WeatherCode::LightFreezingDrizzle
-            | WeatherCode::LightRain
-            | WeatherCode::LightFreezingRain => {
+            Self::LightRainShowers
+            | Self::LightDrizzle
+            | Self::ModerateDrizzle
+            | Self::LightFreezingDrizzle
+            | Self::LightRain
+            | Self::LightFreezingRain => {
                 "/com/github/leo030303/drizzle/weather_status_icons/drizzle-showers.svg"
             }
-            WeatherCode::ModerateRain
-            | WeatherCode::HeavyRain
-            | WeatherCode::DenseFreezingDrizzle
-            | WeatherCode::DenseDrizzle
-            | WeatherCode::ModerateRainShowers
-            | WeatherCode::ViolentRainShowers
-            | WeatherCode::HeavyFreezingRain => {
+            Self::ModerateRain
+            | Self::HeavyRain
+            | Self::DenseFreezingDrizzle
+            | Self::DenseDrizzle
+            | Self::ModerateRainShowers
+            | Self::ViolentRainShowers
+            | Self::HeavyFreezingRain => {
                 "/com/github/leo030303/drizzle/weather_status_icons/drizzle-showers-scattered.svg"
             }
-            WeatherCode::LightSnowShowers
-            | WeatherCode::HeavySnowShowers
-            | WeatherCode::LightSnowFall
-            | WeatherCode::ModerateSnowFall
-            | WeatherCode::HeavySnowFall
-            | WeatherCode::SnowGrains => {
+            Self::LightSnowShowers
+            | Self::HeavySnowShowers
+            | Self::LightSnowFall
+            | Self::ModerateSnowFall
+            | Self::HeavySnowFall
+            | Self::SnowGrains => {
                 "/com/github/leo030303/drizzle/weather_status_icons/drizzle-snow.svg"
             }
-            WeatherCode::Thunderstorm
-            | WeatherCode::ThunderstormLightHail
-            | WeatherCode::ThunderstormHeavyHail => {
+            Self::Thunderstorm | Self::ThunderstormLightHail | Self::ThunderstormHeavyHail => {
                 "/com/github/leo030303/drizzle/weather_status_icons/drizzle-storm.svg"
             }
-            WeatherCode::NoMatch => "",
+            Self::NoMatch => "",
         }
     }
 
-    pub fn get_background_css_class(&self, is_day: bool) -> &'static str {
+    pub const fn get_background_css_class(&self, is_day: bool) -> &'static str {
         match self {
-            WeatherCode::ClearSky | WeatherCode::MainlyClear => {
+            Self::ClearSky | Self::MainlyClear => {
                 if is_day {
                     "bg-weather-clear-sky"
                 } else {
                     "bg-weather-clear-sky-night"
                 }
             }
-            WeatherCode::PartlyCloudy => {
+            Self::PartlyCloudy => {
                 if is_day {
                     "bg-weather-few-clouds"
                 } else {
                     "bg-weather-few-clouds-night"
                 }
             }
-            WeatherCode::Overcast => {
+            Self::Overcast => {
                 if is_day {
                     "bg-weather-overcast"
                 } else {
                     "bg-weather-overcast-night"
                 }
             }
-            WeatherCode::Fog | WeatherCode::DepositingRimeFog => {
+            Self::Fog | Self::DepositingRimeFog => {
                 if is_day {
                     "bg-weather-fog"
                 } else {
                     "bg-weather-fog-night"
                 }
             }
-            WeatherCode::LightRainShowers
-            | WeatherCode::LightDrizzle
-            | WeatherCode::ModerateDrizzle
-            | WeatherCode::LightFreezingDrizzle
-            | WeatherCode::LightRain
-            | WeatherCode::LightFreezingRain => {
+            Self::LightRainShowers
+            | Self::LightDrizzle
+            | Self::ModerateDrizzle
+            | Self::LightFreezingDrizzle
+            | Self::LightRain
+            | Self::LightFreezingRain => {
                 if is_day {
                     "bg-weather-showers-scattered"
                 } else {
                     "bg-weather-showers-scattered-night"
                 }
             }
-            WeatherCode::ModerateRain
-            | WeatherCode::HeavyRain
-            | WeatherCode::DenseFreezingDrizzle
-            | WeatherCode::DenseDrizzle
-            | WeatherCode::ModerateRainShowers
-            | WeatherCode::ViolentRainShowers
-            | WeatherCode::HeavyFreezingRain => {
+            Self::ModerateRain
+            | Self::HeavyRain
+            | Self::DenseFreezingDrizzle
+            | Self::DenseDrizzle
+            | Self::ModerateRainShowers
+            | Self::ViolentRainShowers
+            | Self::HeavyFreezingRain => {
                 if is_day {
                     "bg-weather-showers-large"
                 } else {
                     "bg-weather-showers-large-night"
                 }
             }
-            WeatherCode::LightSnowShowers
-            | WeatherCode::HeavySnowShowers
-            | WeatherCode::LightSnowFall
-            | WeatherCode::ModerateSnowFall
-            | WeatherCode::HeavySnowFall
-            | WeatherCode::SnowGrains => {
+            Self::LightSnowShowers
+            | Self::HeavySnowShowers
+            | Self::LightSnowFall
+            | Self::ModerateSnowFall
+            | Self::HeavySnowFall
+            | Self::SnowGrains => {
                 if is_day {
                     "bg-weather-snow"
                 } else {
                     "bg-weather-snow-night"
                 }
             }
-            WeatherCode::Thunderstorm
-            | WeatherCode::ThunderstormLightHail
-            | WeatherCode::ThunderstormHeavyHail => {
+            Self::Thunderstorm | Self::ThunderstormLightHail | Self::ThunderstormHeavyHail => {
                 if is_day {
                     "bg-weather-storm"
                 } else {
                     "bg-weather-storm-night"
                 }
             }
-            WeatherCode::NoMatch => "",
+            Self::NoMatch => "",
         }
     }
 
     pub fn is_rain(&self) -> bool {
         [
-            WeatherCode::LightDrizzle,
-            WeatherCode::ModerateDrizzle,
-            WeatherCode::DenseDrizzle,
-            WeatherCode::LightFreezingDrizzle,
-            WeatherCode::DenseFreezingDrizzle,
-            WeatherCode::LightRain,
-            WeatherCode::ModerateRain,
-            WeatherCode::HeavyRain,
-            WeatherCode::LightFreezingRain,
-            WeatherCode::HeavyFreezingRain,
-            WeatherCode::LightRainShowers,
-            WeatherCode::ModerateRainShowers,
-            WeatherCode::ViolentRainShowers,
-            WeatherCode::Thunderstorm,
+            Self::LightDrizzle,
+            Self::ModerateDrizzle,
+            Self::DenseDrizzle,
+            Self::LightFreezingDrizzle,
+            Self::DenseFreezingDrizzle,
+            Self::LightRain,
+            Self::ModerateRain,
+            Self::HeavyRain,
+            Self::LightFreezingRain,
+            Self::HeavyFreezingRain,
+            Self::LightRainShowers,
+            Self::ModerateRainShowers,
+            Self::ViolentRainShowers,
+            Self::Thunderstorm,
         ]
         .contains(self)
     }
 
     pub fn is_snow(&self) -> bool {
         [
-            WeatherCode::LightSnowFall,
-            WeatherCode::ModerateSnowFall,
-            WeatherCode::HeavySnowFall,
-            WeatherCode::LightSnowShowers,
-            WeatherCode::HeavySnowShowers,
-            WeatherCode::SnowGrains,
+            Self::LightSnowFall,
+            Self::ModerateSnowFall,
+            Self::HeavySnowFall,
+            Self::LightSnowShowers,
+            Self::HeavySnowShowers,
+            Self::SnowGrains,
         ]
         .contains(self)
     }
 
     pub fn is_fog(&self) -> bool {
-        [WeatherCode::Fog, WeatherCode::DepositingRimeFog].contains(self)
+        [Self::Fog, Self::DepositingRimeFog].contains(self)
     }
 
     pub fn is_storm(&self) -> bool {
         [
-            WeatherCode::Thunderstorm,
-            WeatherCode::ThunderstormLightHail,
-            WeatherCode::ThunderstormHeavyHail,
+            Self::Thunderstorm,
+            Self::ThunderstormLightHail,
+            Self::ThunderstormHeavyHail,
         ]
         .contains(self)
     }
@@ -265,35 +261,35 @@ impl WeatherCode {
 impl From<i64> for WeatherCode {
     fn from(value: i64) -> Self {
         match value {
-            0 => WeatherCode::ClearSky,
-            1 => WeatherCode::MainlyClear,
-            2 => WeatherCode::PartlyCloudy,
-            3 => WeatherCode::Overcast,
-            45 => WeatherCode::Fog,
-            48 => WeatherCode::DepositingRimeFog,
-            51 => WeatherCode::LightDrizzle,
-            53 => WeatherCode::ModerateDrizzle,
-            55 => WeatherCode::DenseDrizzle,
-            56 => WeatherCode::LightFreezingDrizzle,
-            57 => WeatherCode::DenseFreezingDrizzle,
-            61 => WeatherCode::LightRain,
-            63 => WeatherCode::ModerateRain,
-            65 => WeatherCode::HeavyRain,
-            66 => WeatherCode::LightFreezingRain,
-            67 => WeatherCode::HeavyFreezingRain,
-            71 => WeatherCode::LightSnowFall,
-            73 => WeatherCode::ModerateSnowFall,
-            75 => WeatherCode::HeavySnowFall,
-            77 => WeatherCode::SnowGrains,
-            80 => WeatherCode::LightRainShowers,
-            81 => WeatherCode::ModerateRainShowers,
-            82 => WeatherCode::ViolentRainShowers,
-            85 => WeatherCode::LightSnowShowers,
-            86 => WeatherCode::HeavySnowShowers,
-            95 => WeatherCode::Thunderstorm,
-            96 => WeatherCode::ThunderstormLightHail,
-            99 => WeatherCode::ThunderstormHeavyHail,
-            _ => WeatherCode::NoMatch,
+            0 => Self::ClearSky,
+            1 => Self::MainlyClear,
+            2 => Self::PartlyCloudy,
+            3 => Self::Overcast,
+            45 => Self::Fog,
+            48 => Self::DepositingRimeFog,
+            51 => Self::LightDrizzle,
+            53 => Self::ModerateDrizzle,
+            55 => Self::DenseDrizzle,
+            56 => Self::LightFreezingDrizzle,
+            57 => Self::DenseFreezingDrizzle,
+            61 => Self::LightRain,
+            63 => Self::ModerateRain,
+            65 => Self::HeavyRain,
+            66 => Self::LightFreezingRain,
+            67 => Self::HeavyFreezingRain,
+            71 => Self::LightSnowFall,
+            73 => Self::ModerateSnowFall,
+            75 => Self::HeavySnowFall,
+            77 => Self::SnowGrains,
+            80 => Self::LightRainShowers,
+            81 => Self::ModerateRainShowers,
+            82 => Self::ViolentRainShowers,
+            85 => Self::LightSnowShowers,
+            86 => Self::HeavySnowShowers,
+            95 => Self::Thunderstorm,
+            96 => Self::ThunderstormLightHail,
+            99 => Self::ThunderstormHeavyHail,
+            _ => Self::NoMatch,
         }
     }
 }

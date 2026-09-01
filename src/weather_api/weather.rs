@@ -5,17 +5,20 @@ use crate::weather_api::{find_city::GeoResponse, uv_index::UvIndex, weather_code
 const OPEN_METEO_BASE_URL: &str = "https://api.open-meteo.com/v1/forecast";
 
 #[derive(Debug, Deserialize)]
-pub struct WeatherResponse {
+pub struct WeatherResponseCurrent {
+    pub current: CurrentWeatherRaw,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct WeatherResponseHourly {
     pub utc_offset_seconds: i64,
+    pub hourly: HourlyWeatherRaw,
+}
 
-    #[serde(default)]
-    pub current: Option<CurrentWeatherRaw>,
-
-    #[serde(default)]
-    pub hourly: Option<HourlyWeatherRaw>,
-
-    #[serde(default)]
-    pub daily: Option<DailyWeatherRaw>,
+#[derive(Debug, Deserialize)]
+pub struct WeatherResponseDaily {
+    pub utc_offset_seconds: i64,
+    pub daily: DailyWeatherRaw,
 }
 
 #[derive(Debug)]
@@ -108,17 +111,55 @@ impl HourlyWeatherRaw {
         self.time
             .iter()
             .enumerate()
-            .map(|(i, &time)| HourlyEntry {
-                time: time + utc_offset,
-                temperature_2m: self.temperature_2m[i],
-                apparent_temperature: self.apparent_temperature[i],
-                weathercode: WeatherCode::from(self.weathercode[i]),
-                precipitation: self.precipitation[i],
-                precipitation_probability: self.precipitation_probability[i],
-                windspeed_10m: self.windspeed_10m[i],
-                uv_index: UvIndex::from(self.uv_index[i]),
-                is_day: self.is_day[i] == 1,
-                is_metric,
+            .filter_map(|(i, &time)| {
+                Some(HourlyEntry {
+                    time: time.saturating_add(utc_offset),
+                    temperature_2m: if let Some(temp) = self.temperature_2m.get(i) {
+                        *temp
+                    } else {
+                        return None;
+                    },
+                    apparent_temperature: if let Some(apparent_temp) =
+                        self.apparent_temperature.get(i)
+                    {
+                        *apparent_temp
+                    } else {
+                        return None;
+                    },
+                    weathercode: if let Some(code) = self.weathercode.get(i) {
+                        WeatherCode::from(*code)
+                    } else {
+                        return None;
+                    },
+                    precipitation: if let Some(prec) = self.precipitation.get(i) {
+                        *prec
+                    } else {
+                        return None;
+                    },
+                    precipitation_probability: if let Some(prec_prob) =
+                        self.precipitation_probability.get(i)
+                    {
+                        *prec_prob
+                    } else {
+                        return None;
+                    },
+                    windspeed_10m: if let Some(wind) = self.windspeed_10m.get(i) {
+                        *wind
+                    } else {
+                        return None;
+                    },
+                    uv_index: if let Some(uv) = self.uv_index.get(i) {
+                        UvIndex::from(*uv)
+                    } else {
+                        return None;
+                    },
+                    is_day: if let Some(day) = self.is_day.get(i) {
+                        *day == 1
+                    } else {
+                        return None;
+                    },
+                    is_metric,
+                })
             })
             .collect()
     }
@@ -129,18 +170,58 @@ impl DailyWeatherRaw {
         self.time
             .iter()
             .enumerate()
-            .map(|(i, &time)| DailyEntry {
-                time: time + utc_offset,
-                weathercode: WeatherCode::from(self.weathercode[i]),
-                temperature_2m_max: self.temperature_2m_max[i],
-                temperature_2m_min: self.temperature_2m_min[i],
-                sunrise: self.sunrise[i] + utc_offset,
-                sunset: self.sunset[i] + utc_offset,
-                uv_index_max: UvIndex::from(self.uv_index_max[i]),
-                precipitation_sum: self.precipitation_sum[i],
-                precipitation_probability_max: self.precipitation_probability_max[i],
-                windspeed_10m_max: self.windspeed_10m_max[i],
-                is_metric,
+            .filter_map(|(i, &time)| {
+                Some(DailyEntry {
+                    time: time.saturating_add(utc_offset),
+                    weathercode: if let Some(code) = self.weathercode.get(i) {
+                        WeatherCode::from(*code)
+                    } else {
+                        return None;
+                    },
+                    temperature_2m_max: if let Some(temp_max) = self.temperature_2m_max.get(i) {
+                        *temp_max
+                    } else {
+                        return None;
+                    },
+                    temperature_2m_min: if let Some(temp_min) = self.temperature_2m_min.get(i) {
+                        *temp_min
+                    } else {
+                        return None;
+                    },
+                    sunrise: if let Some(sunrise) = self.sunrise.get(i) {
+                        sunrise.saturating_add(utc_offset)
+                    } else {
+                        return None;
+                    },
+                    sunset: if let Some(sunset) = self.sunset.get(i) {
+                        sunset.saturating_add(utc_offset)
+                    } else {
+                        return None;
+                    },
+                    uv_index_max: if let Some(uv) = self.uv_index_max.get(i) {
+                        UvIndex::from(*uv)
+                    } else {
+                        return None;
+                    },
+                    precipitation_sum: if let Some(prec_sum) = self.precipitation_sum.get(i) {
+                        *prec_sum
+                    } else {
+                        return None;
+                    },
+                    precipitation_probability_max: if let Some(prec_prob) =
+                        self.precipitation_probability_max.get(i)
+                    {
+                        *prec_prob
+                    } else {
+                        return None;
+                    },
+                    windspeed_10m_max: if let Some(wind) = self.windspeed_10m_max.get(i) {
+                        *wind
+                    } else {
+                        return None;
+                    },
+                    is_metric,
+                })
             })
             .collect()
     }
@@ -149,7 +230,7 @@ impl DailyWeatherRaw {
 pub async fn get_weather_current(
     city_details: &GeoResponse,
     is_metric: bool,
-) -> Result<CurrentWeather, Box<dyn std::error::Error>> {
+) -> Result<CurrentWeather, String> {
     const CURRENT_METRICS_LIST: [&str; 4] = [
         "temperature_2m",
         "is_day",
@@ -168,17 +249,19 @@ pub async fn get_weather_current(
             .push_str("&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch");
     }
     let weather_data = reqwest::get(weather_url)
-        .await?
-        .json::<WeatherResponse>()
-        .await?;
+        .await
+        .map_err(|e| e.to_string())?
+        .json::<WeatherResponseCurrent>()
+        .await
+        .map_err(|e| e.to_string())?;
 
-    Ok(weather_data.current.unwrap().process(is_metric))
+    Ok(weather_data.current.process(is_metric))
 }
 
 pub async fn get_weather_hourly(
     city_details: &GeoResponse,
     is_metric: bool,
-) -> Result<Vec<HourlyEntry>, Box<dyn std::error::Error>> {
+) -> Result<Vec<HourlyEntry>, String> {
     const HOURLY_METRICS_LIST: [&str; 8] = [
         "temperature_2m",
         "apparent_temperature",
@@ -201,20 +284,21 @@ pub async fn get_weather_hourly(
             .push_str("&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch");
     }
     let weather_data = reqwest::get(weather_url)
-        .await?
-        .json::<WeatherResponse>()
-        .await?;
+        .await
+        .map_err(|e| e.to_string())?
+        .json::<WeatherResponseHourly>()
+        .await
+        .map_err(|e| e.to_string())?;
 
     Ok(weather_data
         .hourly
-        .unwrap()
         .to_entries(weather_data.utc_offset_seconds, is_metric))
 }
 
 pub async fn get_weather_daily(
     city_details: &GeoResponse,
     is_metric: bool,
-) -> Result<Vec<DailyEntry>, Box<dyn std::error::Error>> {
+) -> Result<Vec<DailyEntry>, String> {
     const DAILY_METRICS_LIST: [&str; 9] = [
         "weathercode",
         "temperature_2m_max",
@@ -238,12 +322,13 @@ pub async fn get_weather_daily(
             .push_str("&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch");
     }
     let weather_data = reqwest::get(weather_url)
-        .await?
-        .json::<WeatherResponse>()
-        .await?;
+        .await
+        .map_err(|e| e.to_string())?
+        .json::<WeatherResponseDaily>()
+        .await
+        .map_err(|e| e.to_string())?;
 
     Ok(weather_data
         .daily
-        .unwrap()
         .to_entries(weather_data.utc_offset_seconds, is_metric))
 }

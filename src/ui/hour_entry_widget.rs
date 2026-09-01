@@ -39,7 +39,7 @@ impl FactoryComponent for HourEntryWidget {
                 },
                 gtk::Label {
                     set_css_classes: &["title-2"],
-                    set_label: &chrono::DateTime::from_timestamp_secs(self.forecast_data.time).unwrap().format("%H:%M").to_string(),
+                    set_label: &chrono::DateTime::from_timestamp_secs(self.forecast_data.time).map_or_else(|| String::from("Invalid Timestamp"), |time| time.format("%H:%M").to_string()),
                 },
             },
             gtk::Label {

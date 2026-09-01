@@ -20,6 +20,7 @@ fn main() {
             "daytime-sunset",
             "thermometer-gain",
             "thermometer-loss",
+            "radiowaves-none",
         ],
     );
 }

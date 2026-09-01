@@ -22,7 +22,7 @@ impl SimpleComponent for ShortcutsDialog {
         _sender: ComponentSender<Self>,
     ) -> ComponentParts<Self> {
         let model = Self {};
-        let widgets = root.clone();
+        let widgets = root;
 
         // Shortcuts section
         let section = adw::ShortcutsSection::new(None);
@@ -32,7 +32,7 @@ impl SimpleComponent for ShortcutsDialog {
         // section.add(adw::ShortcutsItem::new("New Tab", "<Control>t"));
 
         widgets.add(section);
-        widgets.present(Some(&relm4::main_adw_application().windows()[0]));
+        widgets.present(relm4::main_adw_application().windows().first());
         ComponentParts { model, widgets }
     }
 }

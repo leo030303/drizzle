@@ -39,6 +39,7 @@ use gtk::{gio, glib};
 
 pub struct App {
     is_loading: bool,
+    show_no_wifi_error_message: bool,
     hourly_entries: FactoryVecDeque<HourEntryWidget>,
     daily_entries: FactoryVecDeque<DayEntryWidget>,
     weather_recommendations: FactoryVecDeque<WeatherRecommendationWidget>,
@@ -58,6 +59,7 @@ pub enum AppMsg {
     RefreshWeatherData,
     RefreshWeatherRecommendations,
     SetWeatherData(Vec<HourlyEntry>, Vec<DailyEntry>, CurrentWeather),
+    ShowErrorPage,
     Quit,
 }
 
@@ -103,6 +105,30 @@ impl Component for App {
                     set_height_request: 64,
                 }
 
+            } else if model.show_no_wifi_error_message {
+                gtk::Box {
+                    set_orientation: gtk::Orientation::Vertical,
+
+                    adw::HeaderBar {
+                        pack_end = &gtk::MenuButton {
+                            set_icon_name: "open-menu-symbolic",
+                            set_menu_model: Some(&primary_menu),
+                        }
+                    },
+                    adw::StatusPage {
+                        set_icon_name: Some("radiowaves-none"),
+                        set_title: "Error",
+                        set_description: Some("Error retrieving weather data, check your internet connection"),
+                        set_hexpand: true,
+                        set_vexpand: true,
+                        gtk::Button {
+                            set_label: "Reload",
+                            set_css_classes: &["pill", "suggested-action"],
+                            set_halign: gtk::Align::Center,
+                            connect_clicked => AppMsg::RefreshWeatherData,
+                        }
+                    }
+                }
             } else if model.current_city.is_none() {
                 gtk::Box {
                     set_orientation: gtk::Orientation::Vertical,
@@ -155,7 +181,7 @@ impl Component for App {
                                 set_css_classes: &[
                                     "card",
                                     "weather-card",
-                                    model.current_weather.as_ref().map(|current| current.weathercode.get_background_css_class(current.is_day)).unwrap_or("")
+                                    model.current_weather.as_ref().map_or("", |current| current.weathercode.get_background_css_class(current.is_day))
                                 ],
                                 set_orientation: gtk::Orientation::Vertical,
                                 set_margin_all: 10,
@@ -191,7 +217,7 @@ impl Component for App {
                                                 },
                                                 gtk::Label {
                                                     #[watch]
-                                                    set_label: &model.current_city.as_ref().map(|geo| geo.name.clone()).unwrap_or(String::from("Select A City")),
+                                                    set_label: &model.current_city.as_ref().map_or_else(|| String::from("Select A City"), |geo| geo.name.clone()),
                                                     set_margin_end: 5,
                                                     },
 
@@ -322,6 +348,7 @@ impl Component for App {
                 .detach();
         let mut model = Self {
             is_loading: false,
+            show_no_wifi_error_message: false,
             hourly_entries,
             daily_entries,
             current_weather: None,
@@ -349,7 +376,7 @@ impl Component for App {
             .set_active_name(Some(RecommendationTimespan::FourHour.to_name()));
         let widgets = view_output!();
 
-        let app = root.application().unwrap();
+        let app = root.application().expect("Failed to get application");
         let mut actions = RelmActionGroup::<WindowActionGroup>::new();
 
         let shortcuts_action = {
@@ -406,21 +433,45 @@ impl Component for App {
         match message {
             AppMsg::RefreshWeatherData => {
                 self.is_loading = true;
+                self.show_no_wifi_error_message = false;
                 if let Some(current_city) = self.current_city.clone() {
                     let settings = gio::Settings::new(APP_ID);
                     let is_metric = settings.boolean("use-metric");
                     sender.oneshot_command(async move {
                         let current_weather =
-                            get_weather_current(&current_city, is_metric).await.unwrap();
+                            match get_weather_current(&current_city, is_metric).await {
+                                Ok(weather) => weather,
+                                Err(e) => {
+                                    println!("Error loading weather data: {e}");
+                                    return AppMsg::ShowErrorPage;
+                                }
+                            };
                         let hourly_entries =
-                            get_weather_hourly(&current_city, is_metric).await.unwrap();
-                        let daily_entries =
-                            get_weather_daily(&current_city, is_metric).await.unwrap();
+                            match get_weather_hourly(&current_city, is_metric).await {
+                                Ok(weather) => weather,
+                                Err(e) => {
+                                    println!("Error loading weather data: {e}");
+                                    return AppMsg::ShowErrorPage;
+                                }
+                            };
+                        let daily_entries = match get_weather_daily(&current_city, is_metric).await
+                        {
+                            Ok(weather) => weather,
+                            Err(e) => {
+                                println!("Error loading weather data: {e}");
+                                return AppMsg::ShowErrorPage;
+                            }
+                        };
+
                         AppMsg::SetWeatherData(hourly_entries, daily_entries, current_weather)
                     });
                 } else {
                     self.is_loading = false;
                 }
+            }
+            AppMsg::ShowErrorPage => {
+                self.is_loading = false;
+                self.show_no_wifi_error_message = true;
             }
             AppMsg::Quit => main_application().quit(),
             AppMsg::RefreshWeatherRecommendations => {
@@ -433,7 +484,10 @@ impl Component for App {
                 for rec in get_recommendations(
                     &hour_entries,
                     &RecommendationTimespan::from_name(
-                        &self.recommendation_timespan_toggle.active_name().unwrap(),
+                        &self.recommendation_timespan_toggle.active_name()
+                            .expect(
+                                "No active name set on reccomendation timespan toggle, this shouldn't be possible",
+                            ),
                     ),
                 ) {
                     self.weather_recommendations.guard().push_back(rec);
@@ -450,6 +504,7 @@ impl Component for App {
                 }
                 self.current_weather = Some(current_weather);
                 self.is_loading = false;
+                self.show_no_wifi_error_message = false;
                 sender.input(AppMsg::RefreshWeatherRecommendations);
             }
             AppMsg::ShowCityPicker => {
@@ -467,15 +522,13 @@ impl Component for App {
                 self.daily_scrolled_window
                     .hadjustment()
                     .set_value(self.daily_scrolled_window.hadjustment().lower());
-                if self.recent_cities.contains(&selected_city) {
-                    let target_index = self
-                        .recent_cities
-                        .iter()
-                        .enumerate()
-                        .find(|(_i, item)| **item == selected_city)
-                        .unwrap()
-                        .0;
-                    self.recent_cities.remove(target_index);
+                if let Some(target_index) = self
+                    .recent_cities
+                    .iter()
+                    .enumerate()
+                    .find(|(_i, item)| **item == selected_city)
+                {
+                    self.recent_cities.remove(target_index.0);
                 }
                 self.recent_cities.insert(0, selected_city);
                 if self.recent_cities.len() > 5 {
@@ -496,7 +549,9 @@ impl Component for App {
     }
 
     fn shutdown(&mut self, widgets: &mut Self::Widgets, _output: relm4::Sender<Self::Output>) {
-        widgets.save_app_state(self).unwrap();
+        widgets
+            .save_app_state(self)
+            .expect("A settings key has been set to readonly, please report this bug");
     }
 }
 
@@ -511,7 +566,9 @@ impl AppWidgets {
         settings.set_boolean("is-maximized", self.main_window.is_maximized())?;
         settings.set_string(
             "recommendation-timespan",
-            &model.recommendation_timespan_toggle.active_name().unwrap(),
+            &model.recommendation_timespan_toggle.active_name().expect(
+                "No active name set on reccomendation timespan toggle, this shouldn't be possible",
+            ),
         )?;
         settings.set_strv(
             "recent-cities",

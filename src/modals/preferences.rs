@@ -28,7 +28,7 @@ impl SimpleComponent for PreferencesDialog {
     }
 
     fn init(
-        _: Self::Init,
+        (): Self::Init,
         root: Self::Root,
         sender: ComponentSender<Self>,
     ) -> ComponentParts<Self> {
@@ -41,8 +41,8 @@ impl SimpleComponent for PreferencesDialog {
         preferences_page.add(&preferences_group);
         root.add(&preferences_page);
 
-        let widgets = root.clone();
-        widgets.present(Some(&relm4::main_application().windows()[0]));
+        let widgets = root;
+        widgets.present(relm4::main_application().windows().first());
 
         ComponentParts { model, widgets }
     }
@@ -82,11 +82,17 @@ fn init_unit_row(
 
     toggle_group.connect_active_name_notify(move |group| {
         if group.active_name() == Some("metric".into()) {
-            settings_handle.set_boolean("use-metric", true).unwrap();
+            settings_handle
+                .set_boolean("use-metric", true)
+                .expect("use-metric has been set to readonly, please report this bug");
         } else {
-            settings_handle.set_boolean("use-metric", false).unwrap();
+            settings_handle
+                .set_boolean("use-metric", false)
+                .expect("use-metric has been set to readonly, please report this bug");
         }
-        sender.output(AppMsg::RefreshWeatherData).unwrap();
+        sender
+            .output(AppMsg::RefreshWeatherData)
+            .expect("Called sender.output when all recievers are dropped, please report this bug");
     });
     row
 }
