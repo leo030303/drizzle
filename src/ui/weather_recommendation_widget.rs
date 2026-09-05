@@ -1,6 +1,6 @@
 use relm4::{gtk::prelude::WidgetExt, prelude::*};
 
-use crate::weather_rec::TimedRecommendation;
+use crate::model::weather_rec::TimedRecommendation;
 
 pub struct WeatherRecommendationWidget {
     pub recommendation: TimedRecommendation,

@@ -3,7 +3,7 @@ use relm4::{
     prelude::*,
 };
 
-use crate::{app::AppMsg, weather_api::weather::DailyEntry};
+use crate::{app::AppMsg, model::daily_entry::DailyEntry};
 
 pub struct DayEntryWidget {
     pub forecast_data: DailyEntry,

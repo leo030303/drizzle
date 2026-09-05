@@ -1,6 +1,12 @@
 use serde::Deserialize;
 
-use crate::weather_api::{find_city::GeoResponse, uv_index::UvIndex, weather_code::WeatherCode};
+use crate::{
+    model::{
+        daily_entry::DailyEntry, hourly_entry::HourlyEntry, uv_index::UvIndex,
+        weather_code::WeatherCode,
+    },
+    weather_api::find_city::GeoResponse,
+};
 
 const OPEN_METEO_BASE_URL: &str = "https://api.open-meteo.com/v1/forecast";
 
@@ -75,35 +81,6 @@ pub struct HourlyWeatherRaw {
     pub windspeed_10m: Vec<f64>,
     pub uv_index: Vec<f64>,
     pub is_day: Vec<i64>,
-}
-
-#[derive(Debug, Clone)]
-pub struct HourlyEntry {
-    pub time: i64,
-    pub temperature_2m: f64,
-    pub apparent_temperature: f64,
-    pub weathercode: WeatherCode,
-    pub precipitation: f64,
-    pub precipitation_probability: f64,
-    pub windspeed_10m: f64,
-    pub uv_index: UvIndex,
-    pub is_day: bool,
-    pub is_metric: bool,
-}
-
-#[derive(Debug, Clone)]
-pub struct DailyEntry {
-    pub time: i64,
-    pub weathercode: WeatherCode,
-    pub temperature_2m_max: f64,
-    pub temperature_2m_min: f64,
-    pub sunrise: i64,
-    pub sunset: i64,
-    pub uv_index_max: UvIndex,
-    pub precipitation_sum: f64,
-    pub precipitation_probability_max: f64,
-    pub windspeed_10m_max: f64,
-    pub is_metric: bool,
 }
 
 impl HourlyWeatherRaw {

@@ -1,4 +1,4 @@
-use crate::weather_api::{uv_index::UvIndex, weather::HourlyEntry};
+use crate::model::{hourly_entry::HourlyEntry, uv_index::UvIndex};
 
 #[derive(Debug)]
 pub struct TimedRecommendation {
