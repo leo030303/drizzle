@@ -19,7 +19,9 @@ use crate::weather_rec::get_recommendations;
 use relm4::ComponentController;
 use relm4::Controller;
 use relm4::adw::prelude::AdwDialogExt;
+use relm4::gtk::accessible;
 use relm4::gtk::gio::prelude::SettingsExtManual;
+use relm4::gtk::prelude::AccessibleExtManual;
 use relm4::gtk::prelude::AdjustmentExt;
 use relm4::{
     Component, ComponentParts, ComponentSender, RelmWidgetExt,
@@ -163,10 +165,12 @@ impl Component for App {
                     adw::HeaderBar {
                         pack_start = &gtk::Button {
                             set_icon_name: "view-refresh-symbolic",
+                            update_property: &[accessible::Property::Label("Refresh Weather")],
                             connect_clicked => AppMsg::RefreshWeatherData
                         },
                         pack_end = &gtk::MenuButton {
                             set_icon_name: "open-menu-symbolic",
+                            update_property: &[accessible::Property::Label("Menu")],
                             set_menu_model: Some(&primary_menu),
                         }
                     },
