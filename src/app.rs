@@ -8,7 +8,7 @@ use crate::model::daily_entry::DailyEntry;
 use crate::model::hourly_entry::HourlyEntry;
 use crate::model::weather_rec::RecommendationTimespan;
 use crate::model::weather_rec::get_recommendations;
-use crate::ui::daily_entry_widget::DayEntryWidget;
+use crate::ui::daily_entry_widget::DailyEntryWidget;
 use crate::ui::hour_entry_widget::HourEntryWidget;
 use crate::ui::weather_recommendation_widget::WeatherRecommendationWidget;
 use crate::weather_api::find_city::GeoResponse;
@@ -43,7 +43,7 @@ pub struct App {
     is_loading: bool,
     show_no_wifi_error_message: bool,
     hourly_entries: FactoryVecDeque<HourEntryWidget>,
-    daily_entries: FactoryVecDeque<DayEntryWidget>,
+    daily_entries: FactoryVecDeque<DailyEntryWidget>,
     weather_recommendations: FactoryVecDeque<WeatherRecommendationWidget>,
     recommendation_timespan_toggle: adw::ToggleGroup,
     current_weather: Option<CurrentWeather>,
@@ -343,7 +343,7 @@ impl Component for App {
         let hourly_entries: FactoryVecDeque<HourEntryWidget> = FactoryVecDeque::builder()
             .launch(gtk::Box::default())
             .forward(sender.input_sender(), |output| output);
-        let daily_entries: FactoryVecDeque<DayEntryWidget> = FactoryVecDeque::builder()
+        let daily_entries: FactoryVecDeque<DailyEntryWidget> = FactoryVecDeque::builder()
             .launch(gtk::Box::default())
             .forward(sender.input_sender(), |output| output);
         let weather_recommendations: FactoryVecDeque<WeatherRecommendationWidget> =

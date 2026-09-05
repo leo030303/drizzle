@@ -5,12 +5,12 @@ use relm4::{
 
 use crate::{app::AppMsg, model::daily_entry::DailyEntry};
 
-pub struct DayEntryWidget {
+pub struct DailyEntryWidget {
     pub forecast_data: DailyEntry,
 }
 
 #[relm4::factory(pub)]
-impl FactoryComponent for DayEntryWidget {
+impl FactoryComponent for DailyEntryWidget {
     type Init = DailyEntry;
     type Input = ();
     type Output = AppMsg;
