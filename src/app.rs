@@ -5,7 +5,9 @@ use crate::modals::city_picker::CityPickerDialogMsg;
 use crate::modals::preferences::PreferencesDialog;
 use crate::modals::shortcuts::ShortcutsDialog;
 use crate::model::daily_entry::DailyEntry;
+use crate::model::daily_entry::DailyEntryObject;
 use crate::model::hourly_entry::HourlyEntry;
+use crate::model::hourly_entry::HourlyEntryObject;
 use crate::model::weather_rec::RecommendationTimespan;
 use crate::model::weather_rec::get_recommendations;
 use crate::ui::daily_entry_widget::DailyEntryWidget;
@@ -19,10 +21,18 @@ use crate::weather_api::weather::get_weather_hourly;
 use relm4::ComponentController;
 use relm4::Controller;
 use relm4::adw::prelude::AdwDialogExt;
+use relm4::gtk::ListItem;
+use relm4::gtk::ListView;
+use relm4::gtk::SignalListItemFactory;
+use relm4::gtk::SingleSelection;
 use relm4::gtk::accessible;
+use relm4::gtk::gio::ListStore;
 use relm4::gtk::gio::prelude::SettingsExtManual;
+use relm4::gtk::glib::object::Cast;
+use relm4::gtk::glib::object::CastNone;
 use relm4::gtk::prelude::AccessibleExtManual;
 use relm4::gtk::prelude::AdjustmentExt;
+use relm4::gtk::prelude::ListItemExt;
 use relm4::{
     Component, ComponentParts, ComponentSender, RelmWidgetExt,
     actions::{AccelsPlus, RelmAction, RelmActionGroup},
@@ -42,8 +52,8 @@ use gtk::{gio, glib};
 pub struct App {
     is_loading: bool,
     show_no_wifi_error_message: bool,
-    hourly_entries: FactoryVecDeque<HourEntryWidget>,
-    daily_entries: FactoryVecDeque<DailyEntryWidget>,
+    hourly_entries_store: ListStore,
+    daily_entries_store: ListStore,
     weather_recommendations: FactoryVecDeque<WeatherRecommendationWidget>,
     recommendation_timespan_toggle: adw::ToggleGroup,
     current_weather: Option<CurrentWeather>,
@@ -114,6 +124,7 @@ impl Component for App {
                     adw::HeaderBar {
                         pack_end = &gtk::MenuButton {
                             set_icon_name: "open-menu-symbolic",
+                            update_property: &[accessible::Property::Label("Menu")],
                             set_menu_model: Some(&primary_menu),
                         }
                     },
@@ -138,6 +149,7 @@ impl Component for App {
                     adw::HeaderBar {
                         pack_end = &gtk::MenuButton {
                             set_icon_name: "open-menu-symbolic",
+                            update_property: &[accessible::Property::Label("Menu")],
                             set_menu_model: Some(&primary_menu),
                         }
                     },
@@ -295,9 +307,8 @@ impl Component for App {
                                 set_policy: (gtk::PolicyType::Automatic, gtk::PolicyType::Never),
 
                                 #[local_ref]
-                                hourly_box -> gtk::Box {
+                                hourly_entry_list_view -> gtk::ListView {
                                     set_orientation: gtk::Orientation::Horizontal,
-                                    set_spacing: 5,
                                     set_margin_all: 10,
                                 }
                             },
@@ -313,9 +324,8 @@ impl Component for App {
                                 set_policy: (gtk::PolicyType::Automatic, gtk::PolicyType::Never),
 
                                 #[local_ref]
-                                daily_box -> gtk::Box {
+                                daily_entry_list_view -> gtk::ListView {
                                     set_orientation: gtk::Orientation::Horizontal,
-                                    set_spacing: 5,
                                     set_margin_all: 10,
                                 }
                             },
@@ -340,12 +350,10 @@ impl Component for App {
         root: Self::Root,
         sender: ComponentSender<Self>,
     ) -> ComponentParts<Self> {
-        let hourly_entries: FactoryVecDeque<HourEntryWidget> = FactoryVecDeque::builder()
-            .launch(gtk::Box::default())
-            .forward(sender.input_sender(), |output| output);
-        let daily_entries: FactoryVecDeque<DailyEntryWidget> = FactoryVecDeque::builder()
-            .launch(gtk::Box::default())
-            .forward(sender.input_sender(), |output| output);
+        let hourly_entries_store = gio::ListStore::new::<HourlyEntryObject>();
+        let daily_entries_store = gio::ListStore::new::<DailyEntryObject>();
+        let (hourly_entry_list_view, daily_entry_list_view) =
+            init_list_views(hourly_entries_store.clone(), daily_entries_store.clone());
         let weather_recommendations: FactoryVecDeque<WeatherRecommendationWidget> =
             FactoryVecDeque::builder()
                 .launch(gtk::Box::default())
@@ -353,8 +361,8 @@ impl Component for App {
         let mut model = Self {
             is_loading: false,
             show_no_wifi_error_message: false,
-            hourly_entries,
-            daily_entries,
+            hourly_entries_store,
+            daily_entries_store,
             current_weather: None,
             current_city: None,
             city_search_dialog: CityPickerDialog::builder()
@@ -366,8 +374,6 @@ impl Component for App {
             recommendation_timespan_toggle: adw::ToggleGroup::new(),
             weather_recommendations,
         };
-        let hourly_box = model.hourly_entries.widget();
-        let daily_box = model.daily_entries.widget();
         let weather_recommendations_box = model.weather_recommendations.widget();
         let city_picker_button = gtk::Button::new();
         let none_selected_city_picker_button = gtk::Button::new();
@@ -381,49 +387,10 @@ impl Component for App {
         let widgets = view_output!();
 
         let app = root.application().expect("Failed to get application");
-        let mut actions = RelmActionGroup::<WindowActionGroup>::new();
 
-        let shortcuts_action = {
-            RelmAction::<ShortcutsAction>::new_stateless(move |_| {
-                ShortcutsDialog::builder().launch(()).detach();
-            })
-        };
-
-        let about_action = {
-            RelmAction::<AboutAction>::new_stateless(move |_| {
-                AboutDialog::builder().launch(()).detach();
-            })
-        };
-
-        let preferences_action = {
-            RelmAction::<PreferencesAction>::new_stateless(clone!(
-                #[strong]
-                sender,
-                move |_| {
-                    PreferencesDialog::builder()
-                        .launch(())
-                        .forward(sender.input_sender(), |response| response);
-                },
-            ))
-        };
-
-        let quit_action = {
-            RelmAction::<QuitAction>::new_stateless(clone!(
-                #[strong]
-                sender,
-                move |_| {
-                    sender.input(AppMsg::Quit);
-                }
-            ))
-        };
-
+        let actions = init_app_actions(&sender);
         // Connect action with hotkeys
         app.set_accelerators_for_action::<QuitAction>(&["<Control>q"]);
-
-        actions.add_action(shortcuts_action);
-        actions.add_action(about_action);
-        actions.add_action(preferences_action);
-        actions.add_action(quit_action);
         actions.register_for_widget(&widgets.main_window);
 
         widgets.load_app_state(&mut model);
@@ -481,9 +448,14 @@ impl Component for App {
             AppMsg::RefreshWeatherRecommendations => {
                 self.weather_recommendations.guard().clear();
                 let hour_entries: Vec<HourlyEntry> = self
-                    .hourly_entries
-                    .iter()
-                    .map(|item| item.forecast_data.clone())
+                    .hourly_entries_store
+                    .into_iter()
+                    .map(|item| {
+                        item.expect("Never None")
+                            .downcast::<HourlyEntryObject>()
+                            .expect("Should be HourlyEntryObject")
+                            .entry()
+                    })
                     .collect();
                 for rec in get_recommendations(
                     &hour_entries,
@@ -498,13 +470,15 @@ impl Component for App {
                 }
             }
             AppMsg::SetWeatherData(hour_entries, day_entries, current_weather) => {
-                self.hourly_entries.guard().clear();
+                self.hourly_entries_store.remove_all();
                 for entry in hour_entries {
-                    self.hourly_entries.guard().push_back(entry);
+                    self.hourly_entries_store
+                        .append(&HourlyEntryObject::new(entry));
                 }
-                self.daily_entries.guard().clear();
+                self.daily_entries_store.remove_all();
                 for entry in day_entries {
-                    self.daily_entries.guard().push_back(entry);
+                    self.daily_entries_store
+                        .append(&DailyEntryObject::new(entry));
                 }
                 self.current_weather = Some(current_weather);
                 self.is_loading = false;
@@ -557,6 +531,106 @@ impl Component for App {
             .save_app_state(self)
             .expect("A settings key has been set to readonly, please report this bug");
     }
+}
+
+fn init_app_actions(sender: &ComponentSender<App>) -> RelmActionGroup<WindowActionGroup> {
+    let mut actions = RelmActionGroup::<WindowActionGroup>::new();
+
+    let shortcuts_action = {
+        RelmAction::<ShortcutsAction>::new_stateless(move |_| {
+            ShortcutsDialog::builder().launch(()).detach();
+        })
+    };
+
+    let about_action = {
+        RelmAction::<AboutAction>::new_stateless(move |_| {
+            AboutDialog::builder().launch(()).detach();
+        })
+    };
+
+    let preferences_action = {
+        RelmAction::<PreferencesAction>::new_stateless(clone!(
+            #[strong]
+            sender,
+            move |_| {
+                PreferencesDialog::builder()
+                    .launch(())
+                    .forward(sender.input_sender(), |response| response);
+            },
+        ))
+    };
+
+    let quit_action = {
+        RelmAction::<QuitAction>::new_stateless(clone!(
+            #[strong]
+            sender,
+            move |_| {
+                sender.input(AppMsg::Quit);
+            }
+        ))
+    };
+
+    actions.add_action(shortcuts_action);
+    actions.add_action(about_action);
+    actions.add_action(preferences_action);
+    actions.add_action(quit_action);
+
+    actions
+}
+
+fn init_list_views(
+    hourly_entries_store: ListStore,
+    daily_entries_store: ListStore,
+) -> (gtk::ListView, gtk::ListView) {
+    let hourly_entry_factory = SignalListItemFactory::new();
+
+    hourly_entry_factory.connect_bind(move |_, list_item| {
+        let hourly_entry_object = list_item
+            .downcast_ref::<ListItem>()
+            .expect("Needs to be ListItem")
+            .item()
+            .and_downcast::<HourlyEntryObject>()
+            .expect("The item has to be an `HourlyEntryObject`.");
+
+        let hourly_entry_widget = HourEntryWidget::builder()
+            .launch(hourly_entry_object.entry())
+            .detach();
+        list_item
+            .downcast_ref::<ListItem>()
+            .expect("Needs to be ListItem")
+            .set_child(Some(&hourly_entry_widget.widget().clone()));
+    });
+
+    let hourly_selection_model = SingleSelection::new(Some(hourly_entries_store));
+
+    let hourly_entry_list_view =
+        ListView::new(Some(hourly_selection_model), Some(hourly_entry_factory));
+
+    let daily_entry_factory = SignalListItemFactory::new();
+
+    daily_entry_factory.connect_bind(move |_, list_item| {
+        let daily_entry_object = list_item
+            .downcast_ref::<ListItem>()
+            .expect("Needs to be ListItem")
+            .item()
+            .and_downcast::<DailyEntryObject>()
+            .expect("The item has to be an `DailyEntryObject`.");
+
+        let daily_entry_widget = DailyEntryWidget::builder()
+            .launch(daily_entry_object.entry())
+            .detach();
+        list_item
+            .downcast_ref::<ListItem>()
+            .expect("Needs to be ListItem")
+            .set_child(Some(&daily_entry_widget.widget().clone()));
+    });
+
+    let daily_selection_model = SingleSelection::new(Some(daily_entries_store));
+
+    let daily_entry_list_view =
+        ListView::new(Some(daily_selection_model), Some(daily_entry_factory));
+
+    (hourly_entry_list_view, daily_entry_list_view)
 }
 
 impl AppWidgets {
