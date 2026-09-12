@@ -24,8 +24,8 @@ use relm4::adw::prelude::AdwDialogExt;
 use relm4::gtk::Accessible;
 use relm4::gtk::ListItem;
 use relm4::gtk::ListView;
+use relm4::gtk::NoSelection;
 use relm4::gtk::SignalListItemFactory;
-use relm4::gtk::SingleSelection;
 use relm4::gtk::accessible;
 use relm4::gtk::gio::ListStore;
 use relm4::gtk::gio::prelude::SettingsExtManual;
@@ -628,13 +628,13 @@ fn init_list_views(
         let hourly_entry_widget = HourEntryWidget::builder()
             .launch(hourly_entry_object.entry())
             .detach();
-        list_item
+        let list_item_widget = list_item
             .downcast_ref::<ListItem>()
-            .expect("Needs to be ListItem")
-            .set_child(Some(&hourly_entry_widget.widget().clone()));
+            .expect("Needs to be ListItem");
+        list_item_widget.set_child(Some(&hourly_entry_widget.widget().clone()));
     });
 
-    let hourly_selection_model = SingleSelection::new(Some(hourly_entries_store));
+    let hourly_selection_model = NoSelection::new(Some(hourly_entries_store));
 
     let hourly_entry_list_view =
         ListView::new(Some(hourly_selection_model), Some(hourly_entry_factory));
@@ -652,13 +652,13 @@ fn init_list_views(
         let daily_entry_widget = DailyEntryWidget::builder()
             .launch(daily_entry_object.entry())
             .detach();
-        list_item
+        let list_item_widget = list_item
             .downcast_ref::<ListItem>()
-            .expect("Needs to be ListItem")
-            .set_child(Some(&daily_entry_widget.widget().clone()));
+            .expect("Needs to be ListItem");
+        list_item_widget.set_child(Some(&daily_entry_widget.widget().clone()));
     });
 
-    let daily_selection_model = SingleSelection::new(Some(daily_entries_store));
+    let daily_selection_model = NoSelection::new(Some(daily_entries_store));
 
     let daily_entry_list_view =
         ListView::new(Some(daily_selection_model), Some(daily_entry_factory));
