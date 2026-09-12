@@ -67,8 +67,8 @@
     https://docs.flathub.org/docs/for-app-authors/metainfo-guidelines/#brand-color
   -->
   <branding>
-    <color type="primary" scheme_preference="light">#ff00ff</color>
-    <color type="primary" scheme_preference="dark">#993d3d</color>
+    <color type="primary" scheme_preference="light">#c061cb</color>
+    <color type="primary" scheme_preference="dark">#4D216F</color>
   </branding>
   <update_contact>leoring03@gmail.com</update_contact>
   <translation type="gettext">@gettext-package@</translation>
