@@ -21,6 +21,7 @@ use crate::weather_api::weather::get_weather_hourly;
 use relm4::ComponentController;
 use relm4::Controller;
 use relm4::adw::prelude::AdwDialogExt;
+use relm4::gtk::Accessible;
 use relm4::gtk::ListItem;
 use relm4::gtk::ListView;
 use relm4::gtk::SignalListItemFactory;
@@ -30,6 +31,7 @@ use relm4::gtk::gio::ListStore;
 use relm4::gtk::gio::prelude::SettingsExtManual;
 use relm4::gtk::glib::object::Cast;
 use relm4::gtk::glib::object::CastNone;
+use relm4::gtk::prelude::AccessibleExt;
 use relm4::gtk::prelude::AccessibleExtManual;
 use relm4::gtk::prelude::AdjustmentExt;
 use relm4::gtk::prelude::ListItemExt;
@@ -296,39 +298,58 @@ impl Component for App {
                                 }
                             },
 
-                            gtk::Label {
-                                set_label: "Hourly",
-                                set_css_classes: &["title-1"],
-                            },
+                            #[name = "hourly_box"]
+                            gtk::Box {
+                                set_orientation: gtk::Orientation::Vertical,
+                                set_focusable: true,
+                                set_accessible_role: gtk::AccessibleRole::Group,
 
-                            #[local_ref]
-                            hourly_scrolled_window -> gtk::ScrolledWindow {
-                                set_hexpand: true,
-                                set_policy: (gtk::PolicyType::Automatic, gtk::PolicyType::Never),
-
-                                #[local_ref]
-                                hourly_entry_list_view -> gtk::ListView {
-                                    set_orientation: gtk::Orientation::Horizontal,
-                                    set_margin_all: 10,
-                                }
-                            },
-
-                            gtk::Label {
-                                set_label: "Daily",
-                                set_css_classes: &["title-1"],
-                            },
-
-                            #[local_ref]
-                            daily_scrolled_window -> gtk::ScrolledWindow {
-                                set_hexpand: true,
-                                set_policy: (gtk::PolicyType::Automatic, gtk::PolicyType::Never),
+                                #[name = "hourly_label"]
+                                gtk::Label {
+                                    set_label: "Hourly Forecast",
+                                    set_css_classes: &["title-1"],
+                                },
 
                                 #[local_ref]
-                                daily_entry_list_view -> gtk::ListView {
-                                    set_orientation: gtk::Orientation::Horizontal,
-                                    set_margin_all: 10,
-                                }
+                                hourly_scrolled_window -> gtk::ScrolledWindow {
+                                    set_hexpand: true,
+                                    set_policy: (gtk::PolicyType::Automatic, gtk::PolicyType::Never),
+
+                                    #[local_ref]
+                                    hourly_entry_list_view -> gtk::ListView {
+                                        set_orientation: gtk::Orientation::Horizontal,
+                                        set_margin_all: 10,
+                                        set_tab_behavior: gtk::ListTabBehavior::Item,
+                                    }
+                                },
                             },
+
+                            #[name = "daily_box"]
+                            gtk::Box {
+                                set_orientation: gtk::Orientation::Vertical,
+                                set_focusable: true,
+                                set_accessible_role: gtk::AccessibleRole::Group,
+
+                                #[name = "daily_label"]
+                                gtk::Label {
+                                    set_label: "Daily Forecast",
+                                    set_css_classes: &["title-1"],
+                                },
+
+                                #[local_ref]
+                                daily_scrolled_window -> gtk::ScrolledWindow {
+                                    set_hexpand: true,
+                                    set_policy: (gtk::PolicyType::Automatic, gtk::PolicyType::Never),
+
+                                    #[local_ref]
+                                    daily_entry_list_view -> gtk::ListView {
+                                        set_orientation: gtk::Orientation::Horizontal,
+                                        set_margin_all: 10,
+                                        set_tab_behavior: gtk::ListTabBehavior::Item,
+                                    }
+                                },
+                            },
+
                             gtk::Label {
                                 set_label: "Weather data from <a href='https://open-meteo.com/'>Open-Meteo</a>.",
                                 set_wrap: true,
@@ -385,6 +406,18 @@ impl Component for App {
             .recommendation_timespan_toggle
             .set_active_name(Some(RecommendationTimespan::FourHour.to_name()));
         let widgets = view_output!();
+        widgets
+            .hourly_box
+            .update_relation(&[accessible::Relation::LabelledBy(&[widgets
+                .hourly_label
+                .upcast_ref::<Accessible>(
+            )])]);
+        widgets
+            .daily_box
+            .update_relation(&[accessible::Relation::LabelledBy(&[widgets
+                .daily_label
+                .upcast_ref::<Accessible>(
+            )])]);
 
         let app = root.application().expect("Failed to get application");
 
