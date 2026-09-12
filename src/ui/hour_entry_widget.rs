@@ -26,6 +26,8 @@ impl Component for HourEntryWidget {
                 model.forecast_data.weathercode.get_background_css_class(model.forecast_data.is_day)
             ],
             set_spacing: 5,
+            set_width_request: 160,
+            set_margin_horizontal: 2,
             gtk::Box{
                 set_orientation: gtk::Orientation::Horizontal,
                 set_spacing: 10,

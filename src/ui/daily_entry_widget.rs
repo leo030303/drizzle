@@ -29,11 +29,15 @@ impl Component for DailyEntryWidget {
                 model.forecast_data.weathercode.get_background_css_class(true)
             ],
             set_spacing: 5,
+            set_width_request: 180,
+            set_margin_horizontal: 2,
             gtk::Box{
                 set_orientation: gtk::Orientation::Horizontal,
                 set_spacing: 10,
                 set_margin_top: 10,
                 set_margin_horizontal: 10,
+                set_hexpand: true,
+                set_halign: gtk::Align::Center,
                 gtk::Image {
                     set_icon_name: Some(model.forecast_data.weathercode.get_icon_name(true)),
                     set_icon_size: gtk::IconSize::Large,

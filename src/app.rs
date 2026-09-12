@@ -310,17 +310,20 @@ impl Component for App {
                                     set_css_classes: &["title-1"],
                                 },
 
-                                #[local_ref]
-                                hourly_scrolled_window -> gtk::ScrolledWindow {
-                                    set_hexpand: true,
-                                    set_policy: (gtk::PolicyType::Automatic, gtk::PolicyType::Never),
-
+                                adw::Clamp {
+                                    set_maximum_size: 770,
                                     #[local_ref]
-                                    hourly_entry_list_view -> gtk::ListView {
-                                        set_orientation: gtk::Orientation::Horizontal,
-                                        set_margin_all: 10,
-                                        set_tab_behavior: gtk::ListTabBehavior::Item,
-                                    }
+                                    hourly_scrolled_window -> gtk::ScrolledWindow {
+                                        set_hexpand: true,
+                                        set_policy: (gtk::PolicyType::Automatic, gtk::PolicyType::Never),
+
+                                        #[local_ref]
+                                        hourly_entry_list_view -> gtk::ListView {
+                                            set_orientation: gtk::Orientation::Horizontal,
+                                            set_margin_all: 10,
+                                            set_tab_behavior: gtk::ListTabBehavior::Item,
+                                        }
+                                    },
                                 },
                             },
 
@@ -336,18 +339,21 @@ impl Component for App {
                                     set_css_classes: &["title-1"],
                                 },
 
-                                #[local_ref]
-                                daily_scrolled_window -> gtk::ScrolledWindow {
-                                    set_hexpand: true,
-                                    set_policy: (gtk::PolicyType::Automatic, gtk::PolicyType::Never),
-
+                                adw::Clamp {
+                                    set_maximum_size: 770,
                                     #[local_ref]
-                                    daily_entry_list_view -> gtk::ListView {
-                                        set_orientation: gtk::Orientation::Horizontal,
-                                        set_margin_all: 10,
-                                        set_tab_behavior: gtk::ListTabBehavior::Item,
-                                    }
-                                },
+                                    daily_scrolled_window -> gtk::ScrolledWindow {
+                                        set_hexpand: true,
+                                        set_policy: (gtk::PolicyType::Automatic, gtk::PolicyType::Never),
+
+                                        #[local_ref]
+                                        daily_entry_list_view -> gtk::ListView {
+                                            set_orientation: gtk::Orientation::Horizontal,
+                                            set_margin_all: 10,
+                                            set_tab_behavior: gtk::ListTabBehavior::Item,
+                                        }
+                                    },
+                                }
                             },
 
                             gtk::Label {
