@@ -112,18 +112,24 @@ impl Component for App {
 
             if model.is_loading {
 
-                adw::Spinner {
-                    set_halign: gtk::Align::Center,
-                    set_valign: gtk::Align::Center,
-                    set_width_request: 64,
-                    set_height_request: 64,
+                adw::ToolbarView {
+                    add_top_bar = &adw::HeaderBar {
+                        pack_end = &gtk::MenuButton {
+                            set_icon_name: "open-menu-symbolic",
+                            update_property: &[accessible::Property::Label("Menu")],
+                            set_menu_model: Some(&primary_menu),
+                            }
+                    },
+                    adw::Spinner {
+                        set_halign: gtk::Align::Center,
+                        set_valign: gtk::Align::Center,
+                        set_width_request: 64,
+                        set_height_request: 64,
+                    }
                 }
-
             } else if model.show_no_wifi_error_message {
-                gtk::Box {
-                    set_orientation: gtk::Orientation::Vertical,
-
-                    adw::HeaderBar {
+                adw::ToolbarView {
+                    add_top_bar = &adw::HeaderBar {
                         pack_end = &gtk::MenuButton {
                             set_icon_name: "open-menu-symbolic",
                             update_property: &[accessible::Property::Label("Menu")],
@@ -145,10 +151,8 @@ impl Component for App {
                     }
                 }
             } else if model.current_city.is_none() {
-                gtk::Box {
-                    set_orientation: gtk::Orientation::Vertical,
-
-                    adw::HeaderBar {
+                adw::ToolbarView {
+                    add_top_bar = &adw::HeaderBar {
                         pack_end = &gtk::MenuButton {
                             set_icon_name: "open-menu-symbolic",
                             update_property: &[accessible::Property::Label("Menu")],
@@ -172,11 +176,8 @@ impl Component for App {
                 }
             } else {
 
-                gtk::Box {
-                    set_orientation: gtk::Orientation::Vertical,
-
-
-                    adw::HeaderBar {
+                adw::ToolbarView {
+                    add_top_bar = &adw::HeaderBar {
                         pack_start = &gtk::Button {
                             set_icon_name: "view-refresh-symbolic",
                             update_property: &[accessible::Property::Label("Refresh Weather")],
@@ -408,9 +409,6 @@ impl Component for App {
         let daily_scrolled_window = model.daily_scrolled_window.clone();
         let timespan_togglegroup = model.recommendation_timespan_toggle.clone();
 
-        model
-            .recommendation_timespan_toggle
-            .set_active_name(Some(RecommendationTimespan::FourHour.to_name()));
         let widgets = view_output!();
         widgets
             .hourly_box
