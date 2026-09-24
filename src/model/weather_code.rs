@@ -36,6 +36,39 @@ pub enum WeatherCode {
 }
 
 impl WeatherCode {
+    pub const fn get_accessible_label(&self) -> &'static str {
+        match self {
+            Self::ClearSky => "Clear Sky",
+            Self::MainlyClear => "Mainly Clear",
+            Self::PartlyCloudy => "Partly Cloudy",
+            Self::Overcast => "Overcast",
+            Self::Fog => "Fog",
+            Self::DepositingRimeFog => "Depositing Rime Fog",
+            Self::LightDrizzle => "Light Drizzle",
+            Self::ModerateDrizzle => "Moderate Drizzle",
+            Self::DenseDrizzle => "Dense Drizzle",
+            Self::LightFreezingDrizzle => "Light Freezing Drizzle",
+            Self::DenseFreezingDrizzle => "Dense Freezing Drizzle",
+            Self::LightRain => "Light Rain",
+            Self::ModerateRain => "Moderate Rain",
+            Self::HeavyRain => "Heavy Rain",
+            Self::LightFreezingRain => "Light Freezing Rain",
+            Self::HeavyFreezingRain => "Heavy Freezing Rain",
+            Self::LightSnowFall => "Light Snow Fall",
+            Self::ModerateSnowFall => "Moderate Snow Fall",
+            Self::HeavySnowFall => "Heavy Snow Fall",
+            Self::SnowGrains => "Snow Grains",
+            Self::LightRainShowers => "Light Rain Showers",
+            Self::ModerateRainShowers => "Moderate Rain Showers",
+            Self::ViolentRainShowers => "Violent Rain Showers",
+            Self::LightSnowShowers => "Light Snow Showers",
+            Self::HeavySnowShowers => "Heavy Snow Showers",
+            Self::Thunderstorm => "Thunderstorm",
+            Self::ThunderstormLightHail => "Thunderstorm Light Hail",
+            Self::ThunderstormHeavyHail => "Thunderstorm Heavy Hail",
+            Self::NoMatch => "No Match",
+        }
+    }
     pub const fn get_icon_name(&self, is_day: bool) -> &'static str {
         match self {
             Self::ClearSky | Self::MainlyClear => {

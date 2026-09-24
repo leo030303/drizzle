@@ -204,6 +204,27 @@ impl Component for App {
                                 ],
                                 set_orientation: gtk::Orientation::Vertical,
                                 set_margin_all: 10,
+                                set_focusable: true,
+                                set_accessible_role: gtk::AccessibleRole::Group,
+                                #[watch]
+                                update_property: &[accessible::Property::Label(&format!(
+                                    "Current Weather {}\nTemperature {}\n{}",
+                                    model.current_weather.as_ref().map(|current| current.weathercode.get_accessible_label()).unwrap_or_default(),
+                                    model.current_weather.as_ref().map(|current|
+                                                format!(
+                                                    "{}{}",
+                                                    current.temperature_2m,
+                                                    if current.is_metric {"℃"} else {"℉"}
+                                                )
+                                            ).unwrap_or_default(),
+                                    model.current_weather.as_ref().map(|current|
+                                        format!(
+                                            "Feels like {}{}",
+                                            current.apparent_temperature,
+                                            if current.is_metric {"℃"} else {"℉"}
+                                        )
+                                    ).unwrap_or_default()
+                                ))],
                                 set_align: gtk::Align::Center,
 
                                 gtk::Box {
@@ -237,6 +258,11 @@ impl Component for App {
                                                 gtk::Label {
                                                     #[watch]
                                                     set_label: &model.current_city.as_ref().map_or_else(|| String::from("Select A City"), |geo| geo.name.clone()),
+                                                    #[watch]
+                                                    update_property: &[accessible::Property::Label(&format!(
+                                                        "Select City\nCurrent City {}",
+                                                        model.current_city.as_ref().map_or_else(|| String::from("None"), |geo| geo.name.clone())
+                                                    ))],
                                                     set_margin_end: 5,
                                                     },
 
@@ -268,27 +294,31 @@ impl Component for App {
                                         },
                                     },
                                 },
-                                #[local_ref]
-                                timespan_togglegroup -> adw::ToggleGroup {
-                                    set_margin_horizontal: 5,
-                                    connect_active_name_notify[sender] => move |_| {
-                                        sender.input(AppMsg::RefreshWeatherRecommendations);
-                                    },
-                                    add = adw::Toggle {
-                                        set_label: Some("4 Hour"),
-                                        set_name: Some(RecommendationTimespan::FourHour.to_name())
-                                    },
-                                    add = adw::Toggle {
-                                        set_label: Some("8 Hour"),
-                                        set_name: Some(RecommendationTimespan::EightHour.to_name())
-                                    },
-                                    add = adw::Toggle {
-                                        set_label: Some("12 Hour"),
-                                        set_name: Some(RecommendationTimespan::TwelveHour.to_name())
-                                    },
-                                    add = adw::Toggle {
-                                        set_label: Some("24 Hour"),
-                                        set_name: Some(RecommendationTimespan::TwentyFourHour.to_name())
+                                gtk::Box {
+                                    update_property: &[accessible::Property::Label("Recommendation Timespan Picker")],
+                                    set_accessible_role: gtk::AccessibleRole::Group,
+                                    #[local_ref]
+                                    timespan_togglegroup -> adw::ToggleGroup {
+                                        set_margin_horizontal: 5,
+                                        connect_active_name_notify[sender] => move |_| {
+                                            sender.input(AppMsg::RefreshWeatherRecommendations);
+                                        },
+                                        add = adw::Toggle {
+                                            set_label: Some("4 Hour"),
+                                            set_name: Some(RecommendationTimespan::FourHour.to_name())
+                                        },
+                                        add = adw::Toggle {
+                                            set_label: Some("8 Hour"),
+                                            set_name: Some(RecommendationTimespan::EightHour.to_name())
+                                        },
+                                        add = adw::Toggle {
+                                            set_label: Some("12 Hour"),
+                                            set_name: Some(RecommendationTimespan::TwelveHour.to_name())
+                                        },
+                                        add = adw::Toggle {
+                                            set_label: Some("24 Hour"),
+                                            set_name: Some(RecommendationTimespan::TwentyFourHour.to_name())
+                                        },
                                     },
                                 },
                                 #[local_ref]
