@@ -1,7 +1,7 @@
 use relm4::{
     gtk::{
         accessible,
-        prelude::{AccessibleExtManual, BoxExt, OrientableExt, WidgetExt},
+        prelude::{AccessibleExt, AccessibleExtManual, BoxExt, OrientableExt, WidgetExt},
     },
     prelude::*,
 };
@@ -31,6 +31,8 @@ impl Component for DailyEntryWidget {
             set_spacing: 5,
             set_width_request: 180,
             set_margin_horizontal: 2,
+            set_accessible_role: gtk::AccessibleRole::Group,
+            update_property: &[accessible::Property::Label(&accessible_label(&model.forecast_data))],
             gtk::Box{
                 set_orientation: gtk::Orientation::Horizontal,
                 set_spacing: 10,
@@ -44,7 +46,8 @@ impl Component for DailyEntryWidget {
                 },
                 gtk::Label {
                     set_css_classes: &["title-2"],
-                    set_label: &chrono::DateTime::from_timestamp_secs(model.forecast_data.time).map_or_else(|| String::from("Invalid Timestamp"), |time| time.format("%a %d/%m").to_string()),
+                    set_label: &time_label(&model.forecast_data),
+                    set_accessible_role: gtk::AccessibleRole::Presentation,
                 },
             },
             gtk::Box{
@@ -59,33 +62,17 @@ impl Component for DailyEntryWidget {
                     set_icon_size: gtk::IconSize::Normal,
                 },
                 gtk::Label {
-                    set_label: &format!(
-                                    "{}{}",
-                                    model.forecast_data.temperature_2m_max,
-                                    if model.forecast_data.is_metric {"℃"} else {"℉"}
-                                ),
-                    update_property: &[accessible::Property::Label(&format!(
-                                    "Maximum Temperature {}{}",
-                                    model.forecast_data.temperature_2m_max,
-                                    if model.forecast_data.is_metric {"℃"} else {"℉"}
-                                ))],
+                    set_label: &max_temp_label(&model.forecast_data),
                     set_margin_end: 10,
+                    set_accessible_role: gtk::AccessibleRole::Presentation,
                 },
                 gtk::Image {
                     set_icon_name: Some("thermometer-loss"),
                     set_icon_size: gtk::IconSize::Normal,
                 },
                 gtk::Label {
-                    set_label: &format!(
-                                    "{}{}",
-                                    model.forecast_data.temperature_2m_min,
-                                    if model.forecast_data.is_metric {"℃"} else {"℉"}
-                                ),
-                    update_property: &[accessible::Property::Label(&format!(
-                                    "Minimum Temperature {}{}",
-                                    model.forecast_data.temperature_2m_min,
-                                    if model.forecast_data.is_metric {"℃"} else {"℉"}
-                                ))],
+                    set_label: &min_temp_label(&model.forecast_data),
+                    set_accessible_role: gtk::AccessibleRole::Presentation,
                 },
             },
             gtk::Box{
@@ -100,40 +87,34 @@ impl Component for DailyEntryWidget {
                     set_icon_size: gtk::IconSize::Normal,
                 },
                 gtk::Label {
-                    set_label: &chrono::DateTime::from_timestamp_secs(model.forecast_data.sunrise).map_or_else(|| String::from("Invalid Timestamp"), |time| time.format("%H:%M").to_string()),
-                    update_property: &[accessible::Property::Label(&chrono::DateTime::from_timestamp_secs(model.forecast_data.sunrise).map_or_else(|| String::from("Invalid Timestamp"), |time| time.format("Sunrise %H:%M").to_string()))],
+                    set_label: &sunrise_label(&model.forecast_data),
                     set_margin_end: 10,
+                    set_accessible_role: gtk::AccessibleRole::Presentation,
                 },
                 gtk::Image {
                     set_icon_name: Some("daytime-sunset"),
                     set_icon_size: gtk::IconSize::Normal,
                 },
                 gtk::Label {
-                    set_label: &chrono::DateTime::from_timestamp_secs(model.forecast_data.sunset).map_or_else(|| String::from("Invalid Timestamp"), |time| time.format("%H:%M").to_string()),
-                    update_property: &[accessible::Property::Label(&chrono::DateTime::from_timestamp_secs(model.forecast_data.sunset).map_or_else(|| String::from("Invalid Timestamp"), |time| time.format("Sunset %H:%M").to_string()))],
+                    set_label: &sunset_label(&model.forecast_data),
+                    set_accessible_role: gtk::AccessibleRole::Presentation,
                 },
             },
             gtk::Label {
-                set_label: &format!(
-                                "Rain: {}{} / {}%",
-                                model.forecast_data.precipitation_sum,
-                                if model.forecast_data.is_metric {"mm"} else {"in"},
-                                model.forecast_data.precipitation_probability_max
-                            ),
+                set_label: &rain_label(&model.forecast_data),
                 set_margin_horizontal: 5,
+                set_accessible_role: gtk::AccessibleRole::Presentation,
             },
             gtk::Label {
-                set_label: &format!(
-                                "Wind: {} {}",
-                                model.forecast_data.windspeed_10m_max,
-                                if model.forecast_data.is_metric {"km/h"} else {"mph"}
-                            ),
+                set_label: &wind_label(&model.forecast_data),
                 set_margin_horizontal: 5,
+                set_accessible_role: gtk::AccessibleRole::Presentation,
             },
             gtk::Label {
-                set_label: &format!("UV Index: {}", model.forecast_data.uv_index_max),
+                set_label: &uv_label(&model.forecast_data),
                 set_margin_horizontal: 5,
                 set_margin_bottom: 10,
+                set_accessible_role: gtk::AccessibleRole::Presentation,
             },
         }
     }
@@ -150,4 +131,89 @@ impl Component for DailyEntryWidget {
 
         ComponentParts { model, widgets }
     }
+}
+
+fn time_label(forecast_data: &DailyEntry) -> String {
+    chrono::DateTime::from_timestamp_secs(forecast_data.time).map_or_else(
+        || String::from("Invalid Timestamp"),
+        |time| time.format("%a %d/%m").to_string(),
+    )
+}
+
+fn max_temp_label(forecast_data: &DailyEntry) -> String {
+    format!(
+        "{}{}",
+        forecast_data.temperature_2m_max,
+        if forecast_data.is_metric {
+            "℃"
+        } else {
+            "℉"
+        }
+    )
+}
+
+fn min_temp_label(forecast_data: &DailyEntry) -> String {
+    format!(
+        "{}{}",
+        forecast_data.temperature_2m_min,
+        if forecast_data.is_metric {
+            "℃"
+        } else {
+            "℉"
+        }
+    )
+}
+
+fn sunrise_label(forecast_data: &DailyEntry) -> String {
+    chrono::DateTime::from_timestamp_secs(forecast_data.sunrise).map_or_else(
+        || String::from("Invalid Timestamp"),
+        |time| time.format("%H:%M").to_string(),
+    )
+}
+
+fn sunset_label(forecast_data: &DailyEntry) -> String {
+    chrono::DateTime::from_timestamp_secs(forecast_data.sunset).map_or_else(
+        || String::from("Invalid Timestamp"),
+        |time| time.format("%H:%M").to_string(),
+    )
+}
+
+fn rain_label(forecast_data: &DailyEntry) -> String {
+    format!(
+        "Rain: {}{} / {}%",
+        forecast_data.precipitation_sum,
+        if forecast_data.is_metric { "mm" } else { "in" },
+        forecast_data.precipitation_probability_max
+    )
+}
+
+fn wind_label(forecast_data: &DailyEntry) -> String {
+    format!(
+        "Wind: {} {}",
+        forecast_data.windspeed_10m_max,
+        if forecast_data.is_metric {
+            "km/h"
+        } else {
+            "mph"
+        }
+    )
+}
+
+fn uv_label(forecast_data: &DailyEntry) -> String {
+    format!("UV Index: {}", forecast_data.uv_index_max)
+}
+
+fn accessible_label(forecast_data: &DailyEntry) -> String {
+    format!(
+        "{}\n{}\nMaximum Temperature {}\nMinimum Temperature {}\nSunrise {}\nSunset {}\n{}\n{}\n{}",
+        time_label(forecast_data),
+        forecast_data.weathercode.get_accessible_label(),
+        max_temp_label(forecast_data),
+        min_temp_label(forecast_data),
+        sunrise_label(forecast_data),
+        sunset_label(forecast_data),
+        rain_label(forecast_data),
+        wind_label(forecast_data),
+        uv_label(forecast_data)
+    )
 }
