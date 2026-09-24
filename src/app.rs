@@ -300,6 +300,8 @@ impl Component for App {
                                     #[local_ref]
                                     timespan_togglegroup -> adw::ToggleGroup {
                                         set_margin_horizontal: 5,
+                                        set_halign: gtk::Align::Center,
+                                        set_hexpand: true,
                                         connect_active_name_notify[sender] => move |_| {
                                             sender.input(AppMsg::RefreshWeatherRecommendations);
                                         },
