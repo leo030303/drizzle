@@ -17,6 +17,7 @@ use app::App;
 relm4::new_action_group!(AppActionGroup, "app");
 relm4::new_stateless_action!(QuitAction, AppActionGroup, "quit");
 
+#[allow(dead_code)]
 mod icon_names {
     include!(concat!(env!("OUT_DIR"), "/icon_names.rs"));
 }

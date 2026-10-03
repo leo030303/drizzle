@@ -488,21 +488,21 @@ impl Component for App {
                         let current_weather =
                             match get_weather_current(&current_city, is_metric).await {
                                 Ok(weather) => weather,
-                                Err(e) => {
+                                Err(_e) => {
                                     return AppMsg::ShowErrorPage;
                                 }
                             };
                         let hourly_entries =
                             match get_weather_hourly(&current_city, is_metric).await {
                                 Ok(weather) => weather,
-                                Err(e) => {
+                                Err(_e) => {
                                     return AppMsg::ShowErrorPage;
                                 }
                             };
                         let daily_entries = match get_weather_daily(&current_city, is_metric).await
                         {
                             Ok(weather) => weather,
-                            Err(e) => {
+                            Err(_e) => {
                                 return AppMsg::ShowErrorPage;
                             }
                         };

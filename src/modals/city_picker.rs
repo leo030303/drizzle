@@ -132,7 +132,7 @@ impl Component for CityPickerDialog {
                 sender.oneshot_command(async move {
                     match search_city_list(&search_query).await {
                         Ok(city_list) => CityPickerDialogMsg::SetCitiesList(city_list),
-                        Err(e) => CityPickerDialogMsg::ShowNoWifiErrorToast,
+                        Err(_e) => CityPickerDialogMsg::ShowNoWifiErrorToast,
                     }
                 });
             }
