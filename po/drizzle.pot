@@ -1,0 +1,419 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the drizzle package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: drizzle\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-09-30 22:33+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: data/com.github.leo030303.drizzle.desktop.in.in:2
+#: data/com.github.leo030303.drizzle.metainfo.xml.in.in:7 src/main.rs:40
+msgid "Drizzle"
+msgstr ""
+
+#. Translators: Search terms to find this application. Do NOT translate or localize the semicolons! The list MUST also end with a semicolon!
+#: data/com.github.leo030303.drizzle.desktop.in.in:9
+msgid "Gnome;GTK;Weather;Forecast;Drizzle;Rain;"
+msgstr ""
+
+#: data/com.github.leo030303.drizzle.gschema.xml.in:6
+msgid "Window width"
+msgstr ""
+
+#: data/com.github.leo030303.drizzle.gschema.xml.in:10
+msgid "Window height"
+msgstr ""
+
+#: data/com.github.leo030303.drizzle.gschema.xml.in:14
+msgid "Window maximized state"
+msgstr ""
+
+#: data/com.github.leo030303.drizzle.gschema.xml.in:18
+msgid "JSON objects of GeoResponses for recent cities"
+msgstr ""
+
+#: data/com.github.leo030303.drizzle.gschema.xml.in:22
+msgid "The timespan to display recommendations for"
+msgstr ""
+
+#: data/com.github.leo030303.drizzle.gschema.xml.in:26
+msgid "Whether to use metric units, if false use imperial"
+msgstr ""
+
+#: data/com.github.leo030303.drizzle.metainfo.xml.in.in:8
+msgid "Foolproof weather forecasts"
+msgstr ""
+
+#: data/com.github.leo030303.drizzle.metainfo.xml.in.in:10
+msgid ""
+"An adaptive, colourful weather app for Gnome. Uses Open Meteo for weather "
+"data. Works best on mobile/small window sizes."
+msgstr ""
+
+#: data/com.github.leo030303.drizzle.metainfo.xml.in.in:15
+msgid "Main window (Dark)"
+msgstr ""
+
+#: data/com.github.leo030303.drizzle.metainfo.xml.in.in:19
+msgid "Main window (Light)"
+msgstr ""
+
+#: data/com.github.leo030303.drizzle.metainfo.xml.in.in:23
+msgid "Adaptive UI"
+msgstr ""
+
+#: data/com.github.leo030303.drizzle.metainfo.xml.in.in:27
+msgid "Search for your city"
+msgstr ""
+
+#: data/resources/ui/shortcuts.ui:11
+msgctxt "shortcut window"
+msgid "General"
+msgstr ""
+
+#: data/resources/ui/shortcuts.ui:14
+msgctxt "shortcut window"
+msgid "Show Shortcuts"
+msgstr ""
+
+#: data/resources/ui/shortcuts.ui:20
+msgctxt "shortcut window"
+msgid "Quit"
+msgstr ""
+
+#: src/app.rs:120 src/app.rs:136 src/app.rs:159 src/app.rs:189
+msgid "Menu"
+msgstr ""
+
+#: src/app.rs:142
+msgid "Error"
+msgstr ""
+
+#: src/app.rs:143
+msgid "Error retrieving weather data, check your internet connection"
+msgstr ""
+
+#: src/app.rs:147
+msgid "Reload"
+msgstr ""
+
+#: src/app.rs:165
+msgid "No City Selected"
+msgstr ""
+
+#: src/app.rs:166
+msgid "Search to find your local city"
+msgstr ""
+
+#: src/app.rs:171
+msgid "Search"
+msgstr ""
+
+#: src/app.rs:184
+msgid "Refresh Weather"
+msgstr ""
+
+#: src/app.rs:213
+msgid "Current Weather"
+msgstr ""
+
+#: src/app.rs:214
+msgid "Temperature"
+msgstr ""
+
+#: src/app.rs:226 src/app.rs:293
+msgid "Feels like"
+msgstr ""
+
+#: src/app.rs:264 src/app.rs:268
+msgid "Select A City"
+msgstr ""
+
+#: src/app.rs:269
+msgid "Current City"
+msgstr ""
+
+#: src/app.rs:270
+msgid "None"
+msgstr ""
+
+#: src/app.rs:305
+msgid "Recommendation Timespan Picker"
+msgstr ""
+
+#: src/app.rs:316 src/app.rs:320 src/app.rs:324 src/app.rs:328
+msgid "Hour"
+msgstr ""
+
+#: src/app.rs:349
+msgid "Hourly Forecast"
+msgstr ""
+
+#: src/app.rs:378
+msgid "Daily Forecast"
+msgstr ""
+
+#: src/app.rs:400
+msgid "Weather data from"
+msgstr ""
+
+#: src/model/uv_index.rs:33
+msgid "Low"
+msgstr ""
+
+#: src/model/uv_index.rs:34
+msgid "Moderate"
+msgstr ""
+
+#: src/model/uv_index.rs:35
+msgid "High"
+msgstr ""
+
+#: src/model/uv_index.rs:36
+msgid "Very High"
+msgstr ""
+
+#: src/model/uv_index.rs:37
+msgid "Extreme"
+msgstr ""
+
+#: src/model/weather_rec.rs:32 src/model/weather_rec.rs:36
+#: src/ui/daily_entry_widget.rs:139 src/ui/daily_entry_widget.rs:170
+#: src/ui/daily_entry_widget.rs:177 src/ui/hour_entry_widget.rs:146
+msgid "Invalid Timestamp"
+msgstr ""
+
+#: src/model/weather_rec.rs:41
+msgid "Wear suncream"
+msgstr ""
+
+#: src/model/weather_rec.rs:46
+msgid "Avoid direct sunlight"
+msgstr ""
+
+#: src/model/weather_rec.rs:52
+msgid "Expect rain and strong winds"
+msgstr ""
+
+#: src/model/weather_rec.rs:58
+msgid "Expect rain and light winds"
+msgstr ""
+
+#: src/model/weather_rec.rs:64
+msgid "Expect strong winds"
+msgstr ""
+
+#: src/model/weather_rec.rs:68
+msgid "Expect a storm"
+msgstr ""
+
+#: src/model/weather_rec.rs:71
+msgid "Expect snow"
+msgstr ""
+
+#: src/model/weather_rec.rs:74
+msgid "Expect fog"
+msgstr ""
+
+#: src/model/weather_rec.rs:77
+msgid "Jumper weather"
+msgstr ""
+
+#: src/model/weather_rec.rs:80
+msgid "Shorts weather"
+msgstr ""
+
+#: src/model/weather_rec.rs:83
+msgid "Freezing"
+msgstr ""
+
+#: src/model/weather_rec.rs:85
+msgid "Sunset at"
+msgstr ""
+
+#: src/model/weather_rec.rs:86
+msgid "Sunrise at"
+msgstr ""
+
+#: src/model/weather_code.rs:42
+msgid "Clear Sky"
+msgstr ""
+
+#: src/model/weather_code.rs:43
+msgid "Mainly Clear"
+msgstr ""
+
+#: src/model/weather_code.rs:44
+msgid "Partly Cloudy"
+msgstr ""
+
+#: src/model/weather_code.rs:45
+msgid "Overcast"
+msgstr ""
+
+#: src/model/weather_code.rs:46
+msgid "Fog"
+msgstr ""
+
+#: src/model/weather_code.rs:47
+msgid "Depositing Rime Fog"
+msgstr ""
+
+#: src/model/weather_code.rs:48
+msgid "Light Drizzle"
+msgstr ""
+
+#: src/model/weather_code.rs:49
+msgid "Moderate Drizzle"
+msgstr ""
+
+#: src/model/weather_code.rs:50
+msgid "Dense Drizzle"
+msgstr ""
+
+#: src/model/weather_code.rs:51
+msgid "Light Freezing Drizzle"
+msgstr ""
+
+#: src/model/weather_code.rs:52
+msgid "Dense Freezing Drizzle"
+msgstr ""
+
+#: src/model/weather_code.rs:53
+msgid "Light Rain"
+msgstr ""
+
+#: src/model/weather_code.rs:54
+msgid "Moderate Rain"
+msgstr ""
+
+#: src/model/weather_code.rs:55
+msgid "Heavy Rain"
+msgstr ""
+
+#: src/model/weather_code.rs:56
+msgid "Light Freezing Rain"
+msgstr ""
+
+#: src/model/weather_code.rs:57
+msgid "Heavy Freezing Rain"
+msgstr ""
+
+#: src/model/weather_code.rs:58
+msgid "Light Snow Fall"
+msgstr ""
+
+#: src/model/weather_code.rs:59
+msgid "Moderate Snow Fall"
+msgstr ""
+
+#: src/model/weather_code.rs:60
+msgid "Heavy Snow Fall"
+msgstr ""
+
+#: src/model/weather_code.rs:61
+msgid "Snow Grains"
+msgstr ""
+
+#: src/model/weather_code.rs:62
+msgid "Light Rain Showers"
+msgstr ""
+
+#: src/model/weather_code.rs:63
+msgid "Moderate Rain Showers"
+msgstr ""
+
+#: src/model/weather_code.rs:64
+msgid "Violent Rain Showers"
+msgstr ""
+
+#: src/model/weather_code.rs:65
+msgid "Light Snow Showers"
+msgstr ""
+
+#: src/model/weather_code.rs:66
+msgid "Heavy Snow Showers"
+msgstr ""
+
+#: src/model/weather_code.rs:67
+msgid "Thunderstorm"
+msgstr ""
+
+#: src/model/weather_code.rs:68
+msgid "Thunderstorm Light Hail"
+msgstr ""
+
+#: src/model/weather_code.rs:69
+msgid "Thunderstorm Heavy Hail"
+msgstr ""
+
+#: src/model/weather_code.rs:70
+msgid "No Match"
+msgstr ""
+
+#: src/ui/daily_entry_widget.rs:185 src/ui/hour_entry_widget.rs:125
+msgid "Rain"
+msgstr ""
+
+#: src/ui/daily_entry_widget.rs:195 src/ui/hour_entry_widget.rs:112
+msgid "Wind"
+msgstr ""
+
+#: src/ui/daily_entry_widget.rs:206 src/ui/hour_entry_widget.rs:106
+msgid "UV Index"
+msgstr ""
+
+#: src/ui/daily_entry_widget.rs:214
+msgid "Maximum Temperature"
+msgstr ""
+
+#: src/ui/daily_entry_widget.rs:215
+msgid "Minimum Temperature"
+msgstr ""
+
+#: src/ui/daily_entry_widget.rs:216
+msgid "Sunrise"
+msgstr ""
+
+#: src/ui/daily_entry_widget.rs:217
+msgid "Sunset"
+msgstr ""
+
+#: src/modals/city_picker.rs:67
+msgid "Search for a city"
+msgstr ""
+
+#: src/modals/city_picker.rs:157
+msgid "Search Error: check internet connection"
+msgstr ""
+
+#: src/modals/preferences.rs:59
+msgid "Units"
+msgstr ""
+
+#: src/modals/preferences.rs:60
+msgid "Which units to use"
+msgstr ""
+
+#: src/modals/preferences.rs:65
+msgid "Metric"
+msgstr ""
+
+#: src/modals/preferences.rs:71
+msgid "Imperial"
+msgstr ""
+
+#: src/modals/shortcuts.rs:30
+msgid "Quit"
+msgstr ""

@@ -1,3 +1,4 @@
+use gettextrs::gettext;
 use relm4::{
     gtk::{
         accessible,
@@ -135,7 +136,7 @@ impl Component for DailyEntryWidget {
 
 fn time_label(forecast_data: &DailyEntry) -> String {
     chrono::DateTime::from_timestamp_secs(forecast_data.time).map_or_else(
-        || String::from("Invalid Timestamp"),
+        || gettext("Invalid Timestamp"),
         |time| time.format("%a %d/%m").to_string(),
     )
 }
@@ -166,21 +167,22 @@ fn min_temp_label(forecast_data: &DailyEntry) -> String {
 
 fn sunrise_label(forecast_data: &DailyEntry) -> String {
     chrono::DateTime::from_timestamp_secs(forecast_data.sunrise).map_or_else(
-        || String::from("Invalid Timestamp"),
+        || gettext("Invalid Timestamp"),
         |time| time.format("%H:%M").to_string(),
     )
 }
 
 fn sunset_label(forecast_data: &DailyEntry) -> String {
     chrono::DateTime::from_timestamp_secs(forecast_data.sunset).map_or_else(
-        || String::from("Invalid Timestamp"),
+        || gettext("Invalid Timestamp"),
         |time| time.format("%H:%M").to_string(),
     )
 }
 
 fn rain_label(forecast_data: &DailyEntry) -> String {
     format!(
-        "Rain: {}{} / {}%",
+        "{}: {}{} / {}%",
+        gettext("Rain"),
         forecast_data.precipitation_sum,
         if forecast_data.is_metric { "mm" } else { "in" },
         forecast_data.precipitation_probability_max
@@ -189,7 +191,8 @@ fn rain_label(forecast_data: &DailyEntry) -> String {
 
 fn wind_label(forecast_data: &DailyEntry) -> String {
     format!(
-        "Wind: {} {}",
+        "{}: {} {}",
+        gettext("Wind"),
         forecast_data.windspeed_10m_max,
         if forecast_data.is_metric {
             "km/h"
@@ -200,17 +203,21 @@ fn wind_label(forecast_data: &DailyEntry) -> String {
 }
 
 fn uv_label(forecast_data: &DailyEntry) -> String {
-    format!("UV Index: {}", forecast_data.uv_index_max)
+    format!("{}: {}", gettext("UV Index"), forecast_data.uv_index_max)
 }
 
 fn accessible_label(forecast_data: &DailyEntry) -> String {
     format!(
-        "{}\n{}\nMaximum Temperature {}\nMinimum Temperature {}\nSunrise {}\nSunset {}\n{}\n{}\n{}",
+        "{}\n{}\n{} {}\n{} {}\n{} {}\n{} {}\n{}\n{}\n{}",
         time_label(forecast_data),
         forecast_data.weathercode.get_accessible_label(),
+        gettext("Maximum Temperature"),
         max_temp_label(forecast_data),
+        gettext("Minimum Temperature"),
         min_temp_label(forecast_data),
+        gettext("Sunrise"),
         sunrise_label(forecast_data),
+        gettext("Sunset"),
         sunset_label(forecast_data),
         rain_label(forecast_data),
         wind_label(forecast_data),

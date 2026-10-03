@@ -1,3 +1,4 @@
+use gettextrs::gettext;
 use relm4::{
     gtk::{
         accessible,
@@ -102,12 +103,13 @@ fn accessible_label(forecast_data: &HourlyEntry) -> String {
 }
 
 fn uv_label(forecast_data: &HourlyEntry) -> String {
-    format!("UV Index: {}", forecast_data.uv_index)
+    format!("{}: {}", gettext("UV Index"), forecast_data.uv_index)
 }
 
 fn wind_label(forecast_data: &HourlyEntry) -> String {
     format!(
-        "Wind: {} {}",
+        "{}: {} {}",
+        gettext("Wind"),
         forecast_data.windspeed_10m,
         if forecast_data.is_metric {
             "km/h"
@@ -119,7 +121,8 @@ fn wind_label(forecast_data: &HourlyEntry) -> String {
 
 fn rain_label(forecast_data: &HourlyEntry) -> String {
     format!(
-        "Rain: {}{} / {}%",
+        "{}: {}{} / {}%",
+        gettext("Rain"),
         forecast_data.precipitation,
         if forecast_data.is_metric { "mm" } else { "in" },
         forecast_data.precipitation_probability
@@ -140,7 +143,7 @@ fn temp_label(forecast_data: &HourlyEntry) -> String {
 
 fn time_label(forecast_data: &HourlyEntry) -> String {
     chrono::DateTime::from_timestamp_secs(forecast_data.time).map_or_else(
-        || String::from("Invalid Timestamp"),
+        || gettext("Invalid Timestamp"),
         |time| time.format("%H:%M").to_string(),
     )
 }

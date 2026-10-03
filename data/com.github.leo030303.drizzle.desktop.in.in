@@ -1,6 +1,6 @@
 [Desktop Entry]
 Name=Drizzle
-Comment=Foolproof weather forecasts
+_Comment=Foolproof weather forecasts
 Type=Application
 Exec=drizzle
 Terminal=false

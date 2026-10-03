@@ -1,3 +1,5 @@
+use gettextrs::gettext;
+
 use crate::model::{hourly_entry::HourlyEntry, uv_index::UvIndex};
 
 #[derive(Debug)]
@@ -27,43 +29,61 @@ pub enum WeatherRecommendation {
 impl TimedRecommendation {
     pub fn get_text(&self) -> String {
         let start_time = chrono::DateTime::from_timestamp_secs(self.start_time).map_or_else(
-            || String::from("Invalid Timestamp"),
+            || gettext("Invalid Timestamp"),
             |time| time.format("%l%P").to_string(),
         );
         let end_time = chrono::DateTime::from_timestamp_secs(self.end_time).map_or_else(
-            || String::from("Invalid Timestamp"),
+            || gettext("Invalid Timestamp"),
             |time| time.format("%l%P").to_string(),
         );
         match &self.recommendation {
-            WeatherRecommendation::LowUvRisk => format!("Wear suncream: {start_time} - {end_time}"),
+            WeatherRecommendation::LowUvRisk => {
+                format!("{}: {start_time} - {end_time}", gettext("Wear suncream"))
+            }
             WeatherRecommendation::HighUvRisk => {
-                format!("Avoid direct sunlight: {start_time} - {end_time}")
+                format!(
+                    "{}: {start_time} - {end_time}",
+                    gettext("Avoid direct sunlight")
+                )
             }
             WeatherRecommendation::ExpectRainStrongWinds => {
-                format!("Expect rain and strong winds: {start_time} - {end_time}",)
+                format!(
+                    "{}: {start_time} - {end_time}",
+                    gettext("Expect rain and strong winds")
+                )
             }
             WeatherRecommendation::ExpectRainLightWinds => {
-                format!("Expect rain and light winds: {start_time} - {end_time}")
+                format!(
+                    "{}: {start_time} - {end_time}",
+                    gettext("Expect rain and light winds")
+                )
             }
             WeatherRecommendation::StrongWinds => {
-                format!("Expect strong winds: {start_time} - {end_time}")
+                format!(
+                    "{}: {start_time} - {end_time}",
+                    gettext("Expect strong winds")
+                )
             }
             WeatherRecommendation::ExpectStorm => {
-                format!("Expect a storm: {start_time} - {end_time}")
+                format!("{}: {start_time} - {end_time}", gettext("Expect a storm"))
             }
-            WeatherRecommendation::ExpectSnow => format!("Expect snow: {start_time} - {end_time}"),
-            WeatherRecommendation::ExpectFog => format!("Expect fog: {start_time} - {end_time}"),
+            WeatherRecommendation::ExpectSnow => {
+                format!("{}: {start_time} - {end_time}", gettext("Expect snow"))
+            }
+            WeatherRecommendation::ExpectFog => {
+                format!("{}: {start_time} - {end_time}", gettext("Expect fog"))
+            }
             WeatherRecommendation::WearJumper => {
-                format!("Jumper weather: {start_time} - {end_time}")
+                format!("{}: {start_time} - {end_time}", gettext("Jumper weather"))
             }
             WeatherRecommendation::WearShorts => {
-                format!("Shorts weather: {start_time} - {end_time}")
+                format!("{}: {start_time} - {end_time}", gettext("Shorts weather"))
             }
             WeatherRecommendation::Freezing => {
-                format!("Freezing: {start_time} - {end_time}")
+                format!("{}: {start_time} - {end_time}", gettext("Freezing"))
             }
-            WeatherRecommendation::Sunset(time) => format!("Sunset at {time}"),
-            WeatherRecommendation::Sunrise(time) => format!("Sunrise at {time}"),
+            WeatherRecommendation::Sunset(time) => format!("{} {time}", gettext("Sunset at")),
+            WeatherRecommendation::Sunrise(time) => format!("{} {time}", gettext("Sunrise at")),
         }
     }
 }

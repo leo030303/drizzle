@@ -1,5 +1,6 @@
 use adw::gtk::prelude::GtkApplicationExt;
 use adw::prelude::AdwDialogExt;
+use gettextrs::gettext;
 use relm4::adw;
 use relm4::prelude::*;
 
@@ -24,12 +25,9 @@ impl SimpleComponent for ShortcutsDialog {
         let model = Self {};
         let widgets = root;
 
-        // Shortcuts section
         let section = adw::ShortcutsSection::new(None);
 
-        // Add more shortcuts items below or create new section
-        section.add(adw::ShortcutsItem::new("Quit", "<Control>q"));
-        // section.add(adw::ShortcutsItem::new("New Tab", "<Control>t"));
+        section.add(adw::ShortcutsItem::new(&gettext("Quit"), "<Control>q"));
 
         widgets.add(section);
         widgets.present(relm4::main_adw_application().windows().first());

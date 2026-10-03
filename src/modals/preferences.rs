@@ -1,4 +1,5 @@
 use adw::prelude::AdwDialogExt;
+use gettextrs::gettext;
 use gtk::prelude::GtkApplicationExt;
 use relm4::{
     ComponentParts, ComponentSender, RelmWidgetExt, SimpleComponent,
@@ -55,19 +56,19 @@ fn init_unit_row(
     sender: ComponentSender<PreferencesDialog>,
 ) -> adw::ActionRow {
     let row = adw::ActionRow::builder()
-        .title("Units")
-        .subtitle("Which units to use")
+        .title(gettext("Units"))
+        .subtitle(gettext("Which units to use"))
         .build();
     let toggle_group = adw::ToggleGroup::new();
     toggle_group.add(
         adw::Toggle::builder()
-            .label("Metric")
+            .label(gettext("Metric"))
             .name("metric")
             .build(),
     );
     toggle_group.add(
         adw::Toggle::builder()
-            .label("Imperial")
+            .label(gettext("Imperial"))
             .name("imperial")
             .build(),
     );

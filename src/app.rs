@@ -18,6 +18,7 @@ use crate::weather_api::weather::CurrentWeather;
 use crate::weather_api::weather::get_weather_current;
 use crate::weather_api::weather::get_weather_daily;
 use crate::weather_api::weather::get_weather_hourly;
+use gettextrs::gettext;
 use relm4::ComponentController;
 use relm4::Controller;
 use relm4::adw::prelude::AdwDialogExt;
@@ -116,7 +117,7 @@ impl Component for App {
                     add_top_bar = &adw::HeaderBar {
                         pack_end = &gtk::MenuButton {
                             set_icon_name: "open-menu-symbolic",
-                            update_property: &[accessible::Property::Label("Menu")],
+                            update_property: &[accessible::Property::Label(&gettext("Menu"))],
                             set_menu_model: Some(&primary_menu),
                             }
                     },
@@ -132,18 +133,18 @@ impl Component for App {
                     add_top_bar = &adw::HeaderBar {
                         pack_end = &gtk::MenuButton {
                             set_icon_name: "open-menu-symbolic",
-                            update_property: &[accessible::Property::Label("Menu")],
+                            update_property: &[accessible::Property::Label(&gettext("Menu"))],
                             set_menu_model: Some(&primary_menu),
                         }
                     },
                     adw::StatusPage {
                         set_icon_name: Some("radiowaves-none"),
-                        set_title: "Error",
-                        set_description: Some("Error retrieving weather data, check your internet connection"),
+                        set_title: &gettext("Error"),
+                        set_description: Some(&gettext("Error retrieving weather data, check your internet connection")),
                         set_hexpand: true,
                         set_vexpand: true,
                         gtk::Button {
-                            set_label: "Reload",
+                            set_label: &gettext("Reload"),
                             set_css_classes: &["pill", "suggested-action"],
                             set_halign: gtk::Align::Center,
                             connect_clicked => AppMsg::RefreshWeatherData,
@@ -155,19 +156,19 @@ impl Component for App {
                     add_top_bar = &adw::HeaderBar {
                         pack_end = &gtk::MenuButton {
                             set_icon_name: "open-menu-symbolic",
-                            update_property: &[accessible::Property::Label("Menu")],
+                            update_property: &[accessible::Property::Label(&gettext("Menu"))],
                             set_menu_model: Some(&primary_menu),
                         }
                     },
                     adw::StatusPage {
                         set_icon_name: Some("system-search-symbolic"),
-                        set_title: "No City Selected",
-                        set_description: Some("Search to find your local city"),
+                        set_title: &gettext("No City Selected"),
+                        set_description: Some(&gettext("Search to find your local city")),
                         set_hexpand: true,
                         set_vexpand: true,
                         #[local_ref]
                         none_selected_city_picker_button -> gtk::Button {
-                            set_label: "Search",
+                            set_label: &gettext("Search"),
                             set_css_classes: &["pill", "suggested-action"],
                             set_halign: gtk::Align::Center,
                             connect_clicked => AppMsg::ShowCityPicker,
@@ -180,12 +181,12 @@ impl Component for App {
                     add_top_bar = &adw::HeaderBar {
                         pack_start = &gtk::Button {
                             set_icon_name: "view-refresh-symbolic",
-                            update_property: &[accessible::Property::Label("Refresh Weather")],
+                            update_property: &[accessible::Property::Label(&gettext("Refresh Weather"))],
                             connect_clicked => AppMsg::RefreshWeatherData
                         },
                         pack_end = &gtk::MenuButton {
                             set_icon_name: "open-menu-symbolic",
-                            update_property: &[accessible::Property::Label("Menu")],
+                            update_property: &[accessible::Property::Label(&gettext("Menu"))],
                             set_menu_model: Some(&primary_menu),
                         }
                     },
@@ -208,8 +209,10 @@ impl Component for App {
                                 set_accessible_role: gtk::AccessibleRole::Group,
                                 #[watch]
                                 update_property: &[accessible::Property::Label(&format!(
-                                    "Current Weather {}\nTemperature {}\n{}",
+                                    "{} {}\n{} {}\n{}",
+                                    gettext("Current Weather"),
                                     model.current_weather.as_ref().map(|current| current.weathercode.get_accessible_label()).unwrap_or_default(),
+                                    gettext("Temperature"),
                                     model.current_weather.as_ref().map(|current|
                                                 format!(
                                                     "{}{}",
@@ -219,7 +222,8 @@ impl Component for App {
                                             ).unwrap_or_default(),
                                     model.current_weather.as_ref().map(|current|
                                         format!(
-                                            "Feels like {}{}",
+                                            "{} {}{}",
+                                            gettext("Feels like"),
                                             current.apparent_temperature,
                                             if current.is_metric {"℃"} else {"℉"}
                                         )
@@ -257,11 +261,13 @@ impl Component for App {
                                                 },
                                                 gtk::Label {
                                                     #[watch]
-                                                    set_label: &model.current_city.as_ref().map_or_else(|| String::from("Select A City"), |geo| geo.name.clone()),
+                                                    set_label: &model.current_city.as_ref().map_or_else(|| gettext("Select A City"), |geo| geo.name.clone()),
                                                     #[watch]
                                                     update_property: &[accessible::Property::Label(&format!(
-                                                        "Select City\nCurrent City {}",
-                                                        model.current_city.as_ref().map_or_else(|| String::from("None"), |geo| geo.name.clone())
+                                                        "{}\n{} {}",
+                                                        gettext("Select A City"),
+                                                        gettext("Current City"),
+                                                        model.current_city.as_ref().map_or_else(|| gettext("None"), |geo| geo.name.clone())
                                                     ))],
                                                     set_margin_end: 5,
                                                     },
@@ -283,7 +289,8 @@ impl Component for App {
                                             #[watch]
                                             set_label: &model.current_weather.as_ref().map(|current|
                                                 format!(
-                                                    "Feels like {}{}",
+                                                    "{} {}{}",
+                                                    gettext("Feels like"),
                                                     current.apparent_temperature,
                                                     if current.is_metric {"℃"} else {"℉"}
                                                 )
@@ -295,7 +302,7 @@ impl Component for App {
                                     },
                                 },
                                 gtk::Box {
-                                    update_property: &[accessible::Property::Label("Recommendation Timespan Picker")],
+                                    update_property: &[accessible::Property::Label(&gettext("Recommendation Timespan Picker"))],
                                     set_accessible_role: gtk::AccessibleRole::Group,
                                     #[local_ref]
                                     timespan_togglegroup -> adw::ToggleGroup {
@@ -306,19 +313,19 @@ impl Component for App {
                                             sender.input(AppMsg::RefreshWeatherRecommendations);
                                         },
                                         add = adw::Toggle {
-                                            set_label: Some("4 Hour"),
+                                            set_label: Some(&format!("4 {}", gettext("Hour"))),
                                             set_name: Some(RecommendationTimespan::FourHour.to_name())
                                         },
                                         add = adw::Toggle {
-                                            set_label: Some("8 Hour"),
+                                            set_label: Some(&format!("8 {}", gettext("Hour"))),
                                             set_name: Some(RecommendationTimespan::EightHour.to_name())
                                         },
                                         add = adw::Toggle {
-                                            set_label: Some("12 Hour"),
+                                            set_label: Some(&format!("12 {}", gettext("Hour"))),
                                             set_name: Some(RecommendationTimespan::TwelveHour.to_name())
                                         },
                                         add = adw::Toggle {
-                                            set_label: Some("24 Hour"),
+                                            set_label: Some(&format!("24 {}", gettext("Hour"))),
                                             set_name: Some(RecommendationTimespan::TwentyFourHour.to_name())
                                         },
                                     },
@@ -339,7 +346,7 @@ impl Component for App {
 
                                 #[name = "hourly_label"]
                                 gtk::Label {
-                                    set_label: "Hourly Forecast",
+                                    set_label: &gettext("Hourly Forecast"),
                                     set_css_classes: &["title-1"],
                                 },
 
@@ -368,7 +375,7 @@ impl Component for App {
 
                                 #[name = "daily_label"]
                                 gtk::Label {
-                                    set_label: "Daily Forecast",
+                                    set_label: &gettext("Daily Forecast"),
                                     set_css_classes: &["title-1"],
                                 },
 
@@ -390,7 +397,7 @@ impl Component for App {
                             },
 
                             gtk::Label {
-                                set_label: "Weather data from <a href='https://open-meteo.com/'>Open-Meteo</a>.",
+                                set_label: &format!("{} <a href='https://open-meteo.com/'>Open-Meteo</a>.", gettext("Weather data from")),
                                 set_wrap: true,
                                 set_use_markup: true,
                                 set_margin_vertical: 5,
@@ -482,7 +489,6 @@ impl Component for App {
                             match get_weather_current(&current_city, is_metric).await {
                                 Ok(weather) => weather,
                                 Err(e) => {
-                                    println!("Error loading weather data: {e}");
                                     return AppMsg::ShowErrorPage;
                                 }
                             };
@@ -490,7 +496,6 @@ impl Component for App {
                             match get_weather_hourly(&current_city, is_metric).await {
                                 Ok(weather) => weather,
                                 Err(e) => {
-                                    println!("Error loading weather data: {e}");
                                     return AppMsg::ShowErrorPage;
                                 }
                             };
@@ -498,7 +503,6 @@ impl Component for App {
                         {
                             Ok(weather) => weather,
                             Err(e) => {
-                                println!("Error loading weather data: {e}");
                                 return AppMsg::ShowErrorPage;
                             }
                         };

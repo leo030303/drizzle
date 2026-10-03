@@ -4,3 +4,11 @@ data/com.github.leo030303.drizzle.metainfo.xml.in.in
 data/resources/ui/shortcuts.ui
 src/app.rs
 src/main.rs
+src/model/uv_index.rs
+src/model/weather_rec.rs
+src/model/weather_code.rs
+src/ui/daily_entry_widget.rs
+src/ui/hour_entry_widget.rs
+src/modals/city_picker.rs
+src/modals/preferences.rs
+src/modals/shortcuts.rs

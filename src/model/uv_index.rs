@@ -1,5 +1,7 @@
 use std::fmt::Display;
 
+use gettextrs::gettext;
+
 #[derive(Debug, Clone)]
 pub enum UvIndex {
     Low,
@@ -28,11 +30,11 @@ impl From<f64> for UvIndex {
 impl Display for UvIndex {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Low => f.write_str("Low"),
-            Self::Moderate => f.write_str("Moderate"),
-            Self::High => f.write_str("High"),
-            Self::VeryHigh => f.write_str("Very High"),
-            Self::Extreme => f.write_str("Extreme"),
+            Self::Low => f.write_str(&gettext("Low")),
+            Self::Moderate => f.write_str(&gettext("Moderate")),
+            Self::High => f.write_str(&gettext("High")),
+            Self::VeryHigh => f.write_str(&gettext("Very High")),
+            Self::Extreme => f.write_str(&gettext("Extreme")),
         }
     }
 }

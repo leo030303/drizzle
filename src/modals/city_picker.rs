@@ -1,3 +1,4 @@
+use gettextrs::gettext;
 use relm4::{
     Component, ComponentParts, ComponentSender, RelmWidgetExt,
     abstractions::Toaster,
@@ -63,7 +64,7 @@ impl Component for CityPickerDialog {
                                 set_halign: gtk::Align::Center,
                                 #[name = "search_entry"]
                                 gtk::SearchEntry {
-                                    set_placeholder_text: Some("Search for a city"),
+                                    set_placeholder_text: Some(&gettext("Search for a city")),
                                     connect_activate => CityPickerDialogMsg::SearchCities,
                                     connect_search_changed[sender] => move |entry| {
                                         sender.input(CityPickerDialogMsg::SearchQueryChanged(entry.text().to_string()));
@@ -131,10 +132,7 @@ impl Component for CityPickerDialog {
                 sender.oneshot_command(async move {
                     match search_city_list(&search_query).await {
                         Ok(city_list) => CityPickerDialogMsg::SetCitiesList(city_list),
-                        Err(e) => {
-                            println!("Error searching for city: {e}");
-                            CityPickerDialogMsg::ShowNoWifiErrorToast
-                        }
+                        Err(e) => CityPickerDialogMsg::ShowNoWifiErrorToast,
                     }
                 });
             }
@@ -156,7 +154,7 @@ impl Component for CityPickerDialog {
             }
             CityPickerDialogMsg::ShowNoWifiErrorToast => {
                 let toast = adw::Toast::builder()
-                    .title("Search Error: check internet connection")
+                    .title(gettext("Search Error: check internet connection"))
                     .timeout(0)
                     .build();
                 self.toaster.add_toast(toast);

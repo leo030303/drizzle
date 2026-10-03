@@ -1,3 +1,4 @@
+use gettextrs::gettext;
 use serde::Deserialize;
 
 /// WMO Weather interpretation codes (WW)
@@ -36,37 +37,37 @@ pub enum WeatherCode {
 }
 
 impl WeatherCode {
-    pub const fn get_accessible_label(&self) -> &'static str {
+    pub fn get_accessible_label(&self) -> String {
         match self {
-            Self::ClearSky => "Clear Sky",
-            Self::MainlyClear => "Mainly Clear",
-            Self::PartlyCloudy => "Partly Cloudy",
-            Self::Overcast => "Overcast",
-            Self::Fog => "Fog",
-            Self::DepositingRimeFog => "Depositing Rime Fog",
-            Self::LightDrizzle => "Light Drizzle",
-            Self::ModerateDrizzle => "Moderate Drizzle",
-            Self::DenseDrizzle => "Dense Drizzle",
-            Self::LightFreezingDrizzle => "Light Freezing Drizzle",
-            Self::DenseFreezingDrizzle => "Dense Freezing Drizzle",
-            Self::LightRain => "Light Rain",
-            Self::ModerateRain => "Moderate Rain",
-            Self::HeavyRain => "Heavy Rain",
-            Self::LightFreezingRain => "Light Freezing Rain",
-            Self::HeavyFreezingRain => "Heavy Freezing Rain",
-            Self::LightSnowFall => "Light Snow Fall",
-            Self::ModerateSnowFall => "Moderate Snow Fall",
-            Self::HeavySnowFall => "Heavy Snow Fall",
-            Self::SnowGrains => "Snow Grains",
-            Self::LightRainShowers => "Light Rain Showers",
-            Self::ModerateRainShowers => "Moderate Rain Showers",
-            Self::ViolentRainShowers => "Violent Rain Showers",
-            Self::LightSnowShowers => "Light Snow Showers",
-            Self::HeavySnowShowers => "Heavy Snow Showers",
-            Self::Thunderstorm => "Thunderstorm",
-            Self::ThunderstormLightHail => "Thunderstorm Light Hail",
-            Self::ThunderstormHeavyHail => "Thunderstorm Heavy Hail",
-            Self::NoMatch => "No Match",
+            Self::ClearSky => gettext("Clear Sky"),
+            Self::MainlyClear => gettext("Mainly Clear"),
+            Self::PartlyCloudy => gettext("Partly Cloudy"),
+            Self::Overcast => gettext("Overcast"),
+            Self::Fog => gettext("Fog"),
+            Self::DepositingRimeFog => gettext("Depositing Rime Fog"),
+            Self::LightDrizzle => gettext("Light Drizzle"),
+            Self::ModerateDrizzle => gettext("Moderate Drizzle"),
+            Self::DenseDrizzle => gettext("Dense Drizzle"),
+            Self::LightFreezingDrizzle => gettext("Light Freezing Drizzle"),
+            Self::DenseFreezingDrizzle => gettext("Dense Freezing Drizzle"),
+            Self::LightRain => gettext("Light Rain"),
+            Self::ModerateRain => gettext("Moderate Rain"),
+            Self::HeavyRain => gettext("Heavy Rain"),
+            Self::LightFreezingRain => gettext("Light Freezing Rain"),
+            Self::HeavyFreezingRain => gettext("Heavy Freezing Rain"),
+            Self::LightSnowFall => gettext("Light Snow Fall"),
+            Self::ModerateSnowFall => gettext("Moderate Snow Fall"),
+            Self::HeavySnowFall => gettext("Heavy Snow Fall"),
+            Self::SnowGrains => gettext("Snow Grains"),
+            Self::LightRainShowers => gettext("Light Rain Showers"),
+            Self::ModerateRainShowers => gettext("Moderate Rain Showers"),
+            Self::ViolentRainShowers => gettext("Violent Rain Showers"),
+            Self::LightSnowShowers => gettext("Light Snow Showers"),
+            Self::HeavySnowShowers => gettext("Heavy Snow Showers"),
+            Self::Thunderstorm => gettext("Thunderstorm"),
+            Self::ThunderstormLightHail => gettext("Thunderstorm Light Hail"),
+            Self::ThunderstormHeavyHail => gettext("Thunderstorm Heavy Hail"),
+            Self::NoMatch => gettext("No Match"),
         }
     }
     pub const fn get_icon_name(&self, is_day: bool) -> &'static str {
