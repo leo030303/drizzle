@@ -46,13 +46,13 @@ fn main() {
     gtk::Window::set_default_icon_name(APP_ID);
 
     let app = main_application();
-    app.set_resource_base_path(Some("/com/github/leo030303/drizzle/"));
+    app.set_resource_base_path(Some("/io/github/leo030303/drizzle/"));
 
     let app = RelmApp::from_app(app);
 
     let data = res
         .lookup_data(
-            "/com/github/leo030303/drizzle/style.css",
+            "/io/github/leo030303/drizzle/style.css",
             gio::ResourceLookupFlags::NONE,
         )
         .expect("Failed data lookup for stylesheet, this app should be built as a flatpak");

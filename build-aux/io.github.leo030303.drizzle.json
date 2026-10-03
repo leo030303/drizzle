@@ -1,5 +1,5 @@
 {
-    "id": "com.github.leo030303.drizzle",
+    "id": "io.github.leo030303.drizzle",
     "runtime": "org.gnome.Platform",
     "runtime-version": "51",
     "sdk": "org.gnome.Sdk",

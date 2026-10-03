@@ -17,63 +17,63 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: data/com.github.leo030303.drizzle.desktop.in.in:2
-#: data/com.github.leo030303.drizzle.metainfo.xml.in.in:7 src/main.rs:40
+#: data/io.github.leo030303.drizzle.desktop.in.in:2
+#: data/io.github.leo030303.drizzle.metainfo.xml.in.in:7 src/main.rs:40
 msgid "Drizzle"
 msgstr ""
 
 #. Translators: Search terms to find this application. Do NOT translate or localize the semicolons! The list MUST also end with a semicolon!
-#: data/com.github.leo030303.drizzle.desktop.in.in:9
+#: data/io.github.leo030303.drizzle.desktop.in.in:9
 msgid "Gnome;GTK;Weather;Forecast;Drizzle;Rain;"
 msgstr ""
 
-#: data/com.github.leo030303.drizzle.gschema.xml.in:6
+#: data/io.github.leo030303.drizzle.gschema.xml.in:6
 msgid "Window width"
 msgstr ""
 
-#: data/com.github.leo030303.drizzle.gschema.xml.in:10
+#: data/io.github.leo030303.drizzle.gschema.xml.in:10
 msgid "Window height"
 msgstr ""
 
-#: data/com.github.leo030303.drizzle.gschema.xml.in:14
+#: data/io.github.leo030303.drizzle.gschema.xml.in:14
 msgid "Window maximized state"
 msgstr ""
 
-#: data/com.github.leo030303.drizzle.gschema.xml.in:18
+#: data/io.github.leo030303.drizzle.gschema.xml.in:18
 msgid "JSON objects of GeoResponses for recent cities"
 msgstr ""
 
-#: data/com.github.leo030303.drizzle.gschema.xml.in:22
+#: data/io.github.leo030303.drizzle.gschema.xml.in:22
 msgid "The timespan to display recommendations for"
 msgstr ""
 
-#: data/com.github.leo030303.drizzle.gschema.xml.in:26
+#: data/io.github.leo030303.drizzle.gschema.xml.in:26
 msgid "Whether to use metric units, if false use imperial"
 msgstr ""
 
-#: data/com.github.leo030303.drizzle.metainfo.xml.in.in:8
+#: data/io.github.leo030303.drizzle.metainfo.xml.in.in:8
 msgid "Foolproof weather forecasts"
 msgstr ""
 
-#: data/com.github.leo030303.drizzle.metainfo.xml.in.in:10
+#: data/io.github.leo030303.drizzle.metainfo.xml.in.in:10
 msgid ""
 "An adaptive, colourful weather app for Gnome. Uses Open Meteo for weather "
 "data. Works best on mobile/small window sizes."
 msgstr ""
 
-#: data/com.github.leo030303.drizzle.metainfo.xml.in.in:15
+#: data/io.github.leo030303.drizzle.metainfo.xml.in.in:15
 msgid "Main window (Dark)"
 msgstr ""
 
-#: data/com.github.leo030303.drizzle.metainfo.xml.in.in:19
+#: data/io.github.leo030303.drizzle.metainfo.xml.in.in:19
 msgid "Main window (Light)"
 msgstr ""
 
-#: data/com.github.leo030303.drizzle.metainfo.xml.in.in:23
+#: data/io.github.leo030303.drizzle.metainfo.xml.in.in:23
 msgid "Adaptive UI"
 msgstr ""
 
-#: data/com.github.leo030303.drizzle.metainfo.xml.in.in:27
+#: data/io.github.leo030303.drizzle.metainfo.xml.in.in:27
 msgid "Search for your city"
 msgstr ""
 

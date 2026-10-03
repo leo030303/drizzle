@@ -118,23 +118,23 @@ impl WeatherCode {
         match self {
             Self::ClearSky | Self::MainlyClear => {
                 if is_day {
-                    "/com/github/leo030303/drizzle/weather_status_icons/drizzle-clear.svg"
+                    "/io/github/leo030303/drizzle/weather_status_icons/drizzle-clear.svg"
                 } else {
-                    "/com/github/leo030303/drizzle/weather_status_icons/drizzle-clear-night.svg"
+                    "/io/github/leo030303/drizzle/weather_status_icons/drizzle-clear-night.svg"
                 }
             }
             Self::PartlyCloudy => {
                 if is_day {
-                    "/com/github/leo030303/drizzle/weather_status_icons/drizzle-few-clouds.svg"
+                    "/io/github/leo030303/drizzle/weather_status_icons/drizzle-few-clouds.svg"
                 } else {
-                    "/com/github/leo030303/drizzle/weather_status_icons/drizzle-few-clouds-night.svg"
+                    "/io/github/leo030303/drizzle/weather_status_icons/drizzle-few-clouds-night.svg"
                 }
             }
             Self::Overcast => {
-                "/com/github/leo030303/drizzle/weather_status_icons/drizzle-overcast.svg"
+                "/io/github/leo030303/drizzle/weather_status_icons/drizzle-overcast.svg"
             }
             Self::Fog | Self::DepositingRimeFog => {
-                "/com/github/leo030303/drizzle/weather_status_icons/drizzle-fog.svg"
+                "/io/github/leo030303/drizzle/weather_status_icons/drizzle-fog.svg"
             }
             Self::LightRainShowers
             | Self::LightDrizzle
@@ -142,7 +142,7 @@ impl WeatherCode {
             | Self::LightFreezingDrizzle
             | Self::LightRain
             | Self::LightFreezingRain => {
-                "/com/github/leo030303/drizzle/weather_status_icons/drizzle-showers.svg"
+                "/io/github/leo030303/drizzle/weather_status_icons/drizzle-showers.svg"
             }
             Self::ModerateRain
             | Self::HeavyRain
@@ -151,7 +151,7 @@ impl WeatherCode {
             | Self::ModerateRainShowers
             | Self::ViolentRainShowers
             | Self::HeavyFreezingRain => {
-                "/com/github/leo030303/drizzle/weather_status_icons/drizzle-showers-scattered.svg"
+                "/io/github/leo030303/drizzle/weather_status_icons/drizzle-showers-scattered.svg"
             }
             Self::LightSnowShowers
             | Self::HeavySnowShowers
@@ -159,10 +159,10 @@ impl WeatherCode {
             | Self::ModerateSnowFall
             | Self::HeavySnowFall
             | Self::SnowGrains => {
-                "/com/github/leo030303/drizzle/weather_status_icons/drizzle-snow.svg"
+                "/io/github/leo030303/drizzle/weather_status_icons/drizzle-snow.svg"
             }
             Self::Thunderstorm | Self::ThunderstormLightHail | Self::ThunderstormHeavyHail => {
-                "/com/github/leo030303/drizzle/weather_status_icons/drizzle-storm.svg"
+                "/io/github/leo030303/drizzle/weather_status_icons/drizzle-storm.svg"
             }
             Self::NoMatch => "",
         }
