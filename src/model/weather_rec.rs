@@ -1,6 +1,7 @@
+use chrono::DurationRound;
 use gettextrs::gettext;
 
-use crate::model::{hourly_entry::HourlyEntry, uv_index::UvIndex};
+use crate::model::{daily_entry::DailyEntry, hourly_entry::HourlyEntry, uv_index::UvIndex};
 
 #[derive(Debug)]
 pub struct TimedRecommendation {
@@ -22,7 +23,7 @@ pub enum WeatherRecommendation {
     WearJumper,
     WearShorts,
     Freezing,
-    Sunset(String), // TODO
+    Sunset(String),
     Sunrise(String),
 }
 
@@ -88,6 +89,7 @@ impl TimedRecommendation {
     }
 }
 
+#[allow(clippy::enum_variant_names)]
 #[derive(Debug)]
 pub enum RecommendationTimespan {
     FourHour,
@@ -103,6 +105,14 @@ impl RecommendationTimespan {
             Self::EightHour => "EightHour",
             Self::TwelveHour => "TwelveHour",
             Self::TwentyFourHour => "TwentyFourHour",
+        }
+    }
+    pub const fn to_int(&self) -> i64 {
+        match self {
+            Self::FourHour => 4,
+            Self::EightHour => 8,
+            Self::TwelveHour => 12,
+            Self::TwentyFourHour => 24,
         }
     }
     pub fn from_name(name: &str) -> Self {
@@ -132,9 +142,13 @@ const FREEZING_TEMP_THRESHOLD_IMPERIAL: f64 = 32.0;
 
 pub fn get_recommendations(
     weather_conditions: &[HourlyEntry],
+    todays_entry: &DailyEntry,
+    tomorrows_entry: &DailyEntry,
     timespan: &RecommendationTimespan,
 ) -> Vec<TimedRecommendation> {
     let mut recommendations_list_with_times: Vec<(WeatherRecommendation, i64, i64)> = vec![];
+
+    // Get general weather recs
     let relevant_conditions = match timespan {
         RecommendationTimespan::FourHour => weather_conditions
             .split_at_checked(4)
@@ -223,6 +237,57 @@ pub fn get_recommendations(
         }
     }
 
+    // Get sunset and sunrise recs
+
+    let current_time_rounded = chrono::Utc::now()
+        .duration_trunc(chrono::TimeDelta::hours(1))
+        .expect("Can't fail");
+    let end_time = current_time_rounded
+        .checked_add_signed(chrono::TimeDelta::hours(timespan.to_int()))
+        .expect("Can't fail");
+
+    let todays_sunrise =
+        chrono::DateTime::from_timestamp_secs(todays_entry.sunrise).expect("Never None");
+    let todays_sunset =
+        chrono::DateTime::from_timestamp_secs(todays_entry.sunset).expect("Never None");
+    let tomorrows_sunrise =
+        chrono::DateTime::from_timestamp_secs(tomorrows_entry.sunrise).expect("Never None");
+    let tomorrows_sunset =
+        chrono::DateTime::from_timestamp_secs(tomorrows_entry.sunset).expect("Never None");
+
+    if todays_sunrise > current_time_rounded && todays_sunrise < end_time {
+        recommendations_list_with_times.push((
+            WeatherRecommendation::Sunrise(todays_sunrise.format("%H:%M").to_string()),
+            0,
+            0,
+        ));
+    }
+
+    if todays_sunset > current_time_rounded && todays_sunset < end_time {
+        recommendations_list_with_times.push((
+            WeatherRecommendation::Sunset(todays_sunset.format("%H:%M").to_string()),
+            0,
+            0,
+        ));
+    }
+
+    if tomorrows_sunrise > current_time_rounded && tomorrows_sunrise < end_time {
+        recommendations_list_with_times.push((
+            WeatherRecommendation::Sunrise(tomorrows_sunrise.format("%H:%M").to_string()),
+            0,
+            0,
+        ));
+    }
+
+    if tomorrows_sunset > current_time_rounded && tomorrows_sunset < end_time {
+        recommendations_list_with_times.push((
+            WeatherRecommendation::Sunset(tomorrows_sunset.format("%H:%M").to_string()),
+            0,
+            0,
+        ));
+    }
+
+    // Group recs
     let mut grouped_recommendations: Vec<TimedRecommendation> = vec![];
     for (recommendation, start_time, end_time) in recommendations_list_with_times {
         if let Some(previous) = grouped_recommendations.iter_mut().find(|previous| {

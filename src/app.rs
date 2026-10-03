@@ -520,26 +520,44 @@ impl Component for App {
             AppMsg::Quit => main_application().quit(),
             AppMsg::RefreshWeatherRecommendations => {
                 self.weather_recommendations.guard().clear();
-                let hour_entries: Vec<HourlyEntry> = self
-                    .hourly_entries_store
-                    .into_iter()
-                    .map(|item| {
-                        item.expect("Never None")
-                            .downcast::<HourlyEntryObject>()
-                            .expect("Should be HourlyEntryObject")
-                            .entry()
-                    })
-                    .collect();
-                for rec in get_recommendations(
-                    &hour_entries,
-                    &RecommendationTimespan::from_name(
+
+                let timespan = RecommendationTimespan::from_name(
                         &self.recommendation_timespan_toggle.active_name()
                             .expect(
                                 "No active name set on reccomendation timespan toggle, this shouldn't be possible",
                             ),
-                    ),
-                ) {
-                    self.weather_recommendations.guard().push_back(rec);
+                    );
+
+                let relevant_daily_entries: Vec<DailyEntry> = self
+                    .daily_entries_store
+                    .into_iter()
+                    .take(2)
+                    .map(|item| {
+                        item.expect("Never None")
+                            .downcast::<DailyEntryObject>()
+                            .expect("Should be DailyEntryObject")
+                            .entry()
+                    })
+                    .collect();
+                if let Some(todays_entry) = relevant_daily_entries.first()
+                    && let Some(tomorrows_entry) = relevant_daily_entries.get(1)
+                {
+                    let hour_entries: Vec<HourlyEntry> = self
+                        .hourly_entries_store
+                        .into_iter()
+                        .map(|item| {
+                            item.expect("Never None")
+                                .downcast::<HourlyEntryObject>()
+                                .expect("Should be HourlyEntryObject")
+                                .entry()
+                        })
+                        .collect();
+
+                    for rec in
+                        get_recommendations(&hour_entries, todays_entry, tomorrows_entry, &timespan)
+                    {
+                        self.weather_recommendations.guard().push_back(rec);
+                    }
                 }
             }
             AppMsg::SetWeatherData(hour_entries, day_entries, current_weather) => {
