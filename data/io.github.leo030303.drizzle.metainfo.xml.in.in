@@ -7,7 +7,12 @@
   <name>Drizzle</name>
   <summary>Foolproof weather forecasts</summary>
   <description>
-    <p>An adaptive, colourful weather app for Gnome. Uses Open Meteo for weather data. Works best on mobile/small window sizes.</p>
+    <p>An adaptive, colourful weather app for the Gnome desktop.</p>
+    <ul>
+      <li>Uses Open Meteo for weather data.</li>
+      <li>Works best on mobile/small window sizes.</li>
+      <li>Uses dynamic colours in the UI based off the current weather.</li>
+    </ul>
   </description>
   <screenshots>
     <screenshot type="default">
@@ -30,24 +35,20 @@
   <url type="homepage">https://github.com/leo030303/drizzle</url>
   <url type="bugtracker">https://github.com/leo030303/drizzle/issues</url>
   <url type="vcs-browser">https://github.com/leo030303/drizzle</url>
-  <!-- Translation repository -->
   <url type="translate">https://github.com/leo030303/drizzle/tree/main/po</url>
-  <!-- Open Age Ratings Service:
-       https://hughsie.github.io/oars/generate.html
-  -->
   <content_rating type="oars-1.1" />
   <releases>https://github.com/leo030303/drizzle/tree/main/po
-    <release version="0.1.0" date="2026-08-21" />
+    <release version="0.1.0" date="2026-10-04">
+      <description>
+        <p>Initial release</p>
+      </description>
+    </release>
   </releases>
   <kudos>
-     <!--
-       GNOME Software kudos:
-       https://gitlab.gnome.org/GNOME/gnome-software/-/blob/main/doc/kudos.md
-     -->
      <kudo>ModernToolkit</kudo>
      <kudo>HiDpiIcon</kudo>
   </kudos>
-  <developer id="github.com">
+  <developer id="github.io">
     <name translate="no">Leo Ring</name>
   </developer>
   <supports>
@@ -59,10 +60,6 @@
     <!-- Mobile/tablet AND desktop supported -->
     <display_length compare="ge">360</display_length>
   </requires>
-  <!--
-    Branding colors:
-    https://docs.flathub.org/docs/for-app-authors/metainfo-guidelines/#brand-color
-  -->
   <branding>
     <color type="primary" scheme_preference="light">#c061cb</color>
     <color type="primary" scheme_preference="dark">#4D216F</color>
