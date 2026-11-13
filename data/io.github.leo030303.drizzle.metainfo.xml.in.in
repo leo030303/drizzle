@@ -38,6 +38,11 @@
   <url type="translate">https://github.com/leo030303/drizzle/tree/main/po</url>
   <content_rating type="oars-1.1" />
   <releases>https://github.com/leo030303/drizzle/tree/main/po
+    <release version="0.1.1" date="2026-11-13">
+      <description>
+        <p>Fixed lopsided city picker layout</p>
+      </description>
+    </release>
     <release version="0.1.0" date="2026-10-04">
       <description>
         <p>Initial release</p>
