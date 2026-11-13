@@ -29,6 +29,6 @@ jobs:
       - uses: actions/checkout@v7
       - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
         with:
-          bundle: aimsir.flatpak
-          manifest-path: build-aux/com.github.leo030303.drizzle.json
+          bundle: drizzle.flatpak
+          manifest-path: build-aux/io.github.leo030303.drizzle.json
           cache-key: flatpak-builder-${{ github.sha }}
