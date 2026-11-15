@@ -9,11 +9,14 @@ pub enum UvIndex {
     High,
     VeryHigh,
     Extreme,
+    NoMatch,
 }
 
 impl From<f64> for UvIndex {
     fn from(value: f64) -> Self {
-        if value < 3.0 {
+        if value < 0.0 {
+            Self::NoMatch
+        } else if value < 3.0 {
             Self::Low
         } else if value < 6.0 {
             Self::Moderate
@@ -30,6 +33,7 @@ impl From<f64> for UvIndex {
 impl Display for UvIndex {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
+            Self::NoMatch => f.write_str(&gettext("Missing data")),
             Self::Low => f.write_str(&gettext("Low")),
             Self::Moderate => f.write_str(&gettext("Moderate")),
             Self::High => f.write_str(&gettext("High")),

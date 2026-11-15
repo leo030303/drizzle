@@ -216,7 +216,7 @@ impl Component for App {
                                     model.current_weather.as_ref().map(|current|
                                                 format!(
                                                     "{}{}",
-                                                    current.temperature_2m,
+                                                    current.temperature_2m.map_or_else(|| String::from("Missing data"), |temp| temp.to_string()),
                                                     if current.is_metric {"℃"} else {"℉"}
                                                 )
                                             ).unwrap_or_default(),
@@ -224,7 +224,7 @@ impl Component for App {
                                         format!(
                                             "{} {}{}",
                                             gettext("Feels like"),
-                                            current.apparent_temperature,
+                                            current.apparent_temperature.map_or_else(|| String::from("Missing data"), |temp| temp.to_string()),
                                             if current.is_metric {"℃"} else {"℉"}
                                         )
                                     ).unwrap_or_default()
@@ -279,7 +279,7 @@ impl Component for App {
                                             set_label: &model.current_weather.as_ref().map(|current|
                                                 format!(
                                                     "{}{}",
-                                                    current.temperature_2m,
+                                                    current.temperature_2m.map_or_else(|| String::from("Missing data"), |temp| temp.to_string()),
                                                     if current.is_metric {"℃"} else {"℉"}
                                                 )
                                             ).unwrap_or_default(),
@@ -291,7 +291,7 @@ impl Component for App {
                                                 format!(
                                                     "{} {}{}",
                                                     gettext("Feels like"),
-                                                    current.apparent_temperature,
+                                                    current.apparent_temperature.map_or_else(|| String::from("Missing data"), |temp| temp.to_string()),
                                                     if current.is_metric {"℃"} else {"℉"}
                                                 )
                                             ).unwrap_or_default(),

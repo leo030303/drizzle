@@ -170,7 +170,7 @@ pub fn get_recommendations(
     for hour_entry in relevant_conditions {
         let mut recommendations_list_raw = vec![];
         match hour_entry.uv_index {
-            UvIndex::Low => {}
+            UvIndex::NoMatch | UvIndex::Low => {}
             UvIndex::Moderate | UvIndex::High => {
                 recommendations_list_raw.push(WeatherRecommendation::LowUvRisk);
             }

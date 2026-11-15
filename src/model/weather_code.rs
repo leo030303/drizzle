@@ -67,7 +67,7 @@ impl WeatherCode {
             Self::Thunderstorm => gettext("Thunderstorm"),
             Self::ThunderstormLightHail => gettext("Thunderstorm Light Hail"),
             Self::ThunderstormHeavyHail => gettext("Thunderstorm Heavy Hail"),
-            Self::NoMatch => gettext("No Match"),
+            Self::NoMatch => gettext("Missing data"),
         }
     }
     pub const fn get_icon_name(&self, is_day: bool) -> &'static str {
