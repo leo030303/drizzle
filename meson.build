@@ -1,7 +1,7 @@
 project(
   'drizzle',
   'rust',
-  version: '0.1.0',
+  version: '0.1.2',
   meson_version: '>= 1.9.2',
   # license: 'MIT',
 )

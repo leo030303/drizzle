@@ -38,6 +38,12 @@
   <url type="translate">https://github.com/leo030303/drizzle/tree/main/po</url>
   <content_rating type="oars-1.1" />
   <releases>https://github.com/leo030303/drizzle/tree/main/po
+    <release version="0.1.2" date="2026-11-15">
+      <description>
+        <p>Fixed bug when open meteo returned incomplete data</p>
+        <p>Performance improvements</p>
+      </description>
+    </release>
     <release version="0.1.1" date="2026-11-13">
       <description>
         <p>Fixed lopsided city picker layout</p>
