@@ -29,6 +29,7 @@ use relm4::gtk::NoSelection;
 use relm4::gtk::SignalListItemFactory;
 use relm4::gtk::accessible;
 use relm4::gtk::gio::ListStore;
+use relm4::gtk::gio::prelude::ListModelExt;
 use relm4::gtk::gio::prelude::SettingsExtManual;
 use relm4::gtk::glib::object::Cast;
 use relm4::gtk::glib::object::CastNone;
@@ -561,16 +562,22 @@ impl Component for App {
                 }
             }
             AppMsg::SetWeatherData(hour_entries, day_entries, current_weather) => {
-                self.hourly_entries_store.remove_all();
-                for entry in hour_entries {
-                    self.hourly_entries_store
-                        .append(&HourlyEntryObject::new(entry));
-                }
-                self.daily_entries_store.remove_all();
-                for entry in day_entries {
-                    self.daily_entries_store
-                        .append(&DailyEntryObject::new(entry));
-                }
+                let hourly_objects: Vec<HourlyEntryObject> = hour_entries
+                    .into_iter()
+                    .map(HourlyEntryObject::new)
+                    .collect();
+                self.hourly_entries_store.splice(
+                    0,
+                    self.hourly_entries_store.n_items(),
+                    &hourly_objects,
+                );
+                let daily_objects: Vec<DailyEntryObject> =
+                    day_entries.into_iter().map(DailyEntryObject::new).collect();
+                self.daily_entries_store.splice(
+                    0,
+                    self.daily_entries_store.n_items(),
+                    &daily_objects,
+                );
                 self.current_weather = Some(current_weather);
                 self.is_loading = false;
                 self.show_no_wifi_error_message = false;
